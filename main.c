@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/24 13:41:48 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/02 20:47:37 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/07 21:05:28 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,8 @@ void	ft_putchar(char c) { write(1, &c, 1); }
 // To Do List:
 // Learn Dispatch Table to improve coding skills and structure handling.
 // Study Exam Questions✓;
-// Create struct to collect flags; 
+// Create struct to collect flags ✓; 
+// Create a function pointers to handle width;
 typedef void (*jumper) ();
 void	put_a(void) {ft_putchar('a');}
 void	put_hello(void) {ft_putstr("hello");}
@@ -170,13 +171,13 @@ int	collect_flag(t_print *p)
 {
 	if (*p->str == '-')
 		return (p->flag |= _F_MINUS);
-	if (*p->str == '+')
+	else if (*p->str == '+')
 		return (p->flag |= _F_PLUS);
-	if (*p->str == ' ')
+	else if (*p->str == ' ')
 		return (p->flag |= _F_SPACE);
-	if (*p->str == '0')
+	else if (*p->str == '0')
 		return (p->flag |= _F_ZERO);
-	if (*p->str == '#')
+	else if (*p->str == '#')
 		return (p->flag |= _F_HASH);	
 	return (0);
 }
@@ -185,41 +186,80 @@ int	collect_type(t_print *p)
 {
 	if (p->type)
 		return (0);
-	if (*p->str == 'c')
+	else if (*p->str == 'c')
 		return (p->type |= _T_C);
-	if (*p->str == 's')
+	else if (*p->str == 's')
 		return (p->type |= _T_S);
-	if (*p->str == 'p')
+	else if (*p->str == 'p')
 		return (p->type |= _T_P);
-	if (*p->str == 'd')
+	else if (*p->str == 'd')
 		return (p->type |= _T_D);
-	if (*p->str == 'i')
+	else if (*p->str == 'i')
 		return (p->type |= _T_I);
-	if (*p->str == 'o')
+	else if (*p->str == 'o')
 		return (p->type |= _T_O);
-	if (*p->str == 'u')
+	else if (*p->str == 'u')
 		return (p->type |= _T_U);
-	if (*p->str == 'x')
+	else if (*p->str == 'x')
 		return (p->type |= _T_LX);
-	if (*p->str == 'X')
+	else if (*p->str == 'X')
 		return (p->type |= _T_UX);
-	if (*p->str == 'f')
+	else if (*p->str == 'f')
 		return (p->type |= _T_F);
 	return (0);
 }
 
+int	collect_width(t_print *p)
+{
+	if (ft_isdigit(*p->str))
+	{
+		p->width = ft_atoi(p->str);
+		while (ft_isdigit(*p->str))
+			p->str++;
+		p->str--;
+		return (1);
+	}
+	else if (*p->str == '*')
+		return (p->width = va_arg(p->ap, int));
+	return (0);
+}
+
+int	collect_pcn(t_print *p)
+{
+	(*p->str == '.') && p->str++;
+	if (ft_isdigit(*p->str))
+	{
+		p->pcn = ft_atoi(p->str);
+		while (ft_isdigit(*p->str))
+			p->str++;
+		p->str--;
+		return (1);
+	}
+	else if (*p->str == '*')
+		return (p->pcn = va_arg(p->ap, int));
+	return (0);
+}
+		
+	
 int	collector_driver(t_print *p)
 {
 	while (collect_flag(p))
 		p->str++;
+//	printf("\nAfter collect flag: %c\n", *p->str);
+	while (collect_width(p))
+		p->str++;
+//	printf("\nAfter collect width: %c\n", *p->str);
+	while (collect_pcn(p))
+		p->str++;
+//	printf("\nAfter collect pcn: %c\n", *p->str);
 	while (collect_type(p))
 		p->str++;
-//	printf("type: %d\n", p->type);
+//	printf("\nflag: %d width: %d pcn: %d type: %d \n", p->flag, p->width, p->pcn, p->type);
 	if (!p->type)
 		return (0);
 	return (1);
 }
-void	_init_print(t_print *p)
+void	init_print(t_print *p)
 {
 	p->flag = 0;
 	p->pcn = 0;
@@ -230,7 +270,7 @@ void	_init_print(t_print *p)
 	p->str = NULL;
 }
 
-void	_reset_collector(t_print *p)
+void	reset_collector(t_print *p)
 {
 	p->flag = 0;
 	p->pcn = 0;
@@ -238,20 +278,83 @@ void	_reset_collector(t_print *p)
 	p->type = 0;
 	p->width = 0;
 }
-int	print_char(t_print *p)
-{
-	int		c;
 
-	c = va_arg(p->ap, int);
-	ft_putchar(c);
-	p->done++;
-	return (1);
+void	print_char_(void print(char), char c, int space, int flag)
+{
+	if (flag)
+	{
+		print(c);
+		while (--space)
+			ft_putchar(' ');
+	}
+	else
+	{
+		while (--space)
+			ft_putchar(' ');
+		print(c);
+	}
 }
 
+void	print_char(t_print *p)
+{
+	char		c;
 
-typedef int		jump_table(t_print *p);
+	c = va_arg(p->ap, int);
+	p->done += (p->width) ? (p->width) : 1;
+	if (p->flag & _F_MINUS)
+		print_char_(ft_putchar, c, p->width, 1);
+	else if (p->width)
+		print_char_(ft_putchar, c, p->width, 0);
+	else
+		ft_putchar(c);
+}
+
+void	print_str_(void	print(const char *), char *s, int space, int flag)
+{
+	if (flag)
+	{
+		if (!s)
+			print("(null)");
+		else
+			print(s);
+		while (space--)
+			ft_putchar(' ');
+	}
+	else
+	{
+		while (space--)
+			ft_putchar(' ');
+		if (!s)
+			print("(null)");
+		else
+			print(s);
+	}
+}
+
+void	print_str(t_print *p)
+{
+	int	space;
+	int len;
+	char	*s;
+
+	s = va_arg(p->ap, char *);
+	len = (s) ? ft_strlen(s) : 6;
+	space = (len > p->width) ? 0 : (p->width - len);
+	p->done += (space) ? (space + len) : len;
+	if (p->flag & _F_MINUS)
+		print_str_(ft_putstr, s, space, 1);
+	else if (space)
+		print_str_(ft_putstr, s, space, 0);
+	else if (!s)
+		ft_putstr("(null)");
+	else
+		ft_putstr(s);
+}
+	
+typedef void		jump_table(t_print *p);
 jump_table *print_table[] = {
-	print_char
+	print_char,
+	print_str
 };
 
 
@@ -259,7 +362,7 @@ int	_ft_printf(const char *str, va_list ap)
 {
 	t_print p;
 
-	_init_print(&p);
+	init_print(&p);
 	va_copy(p.ap, ap);
 	//va_start(p.ap, str);
 	p.str = str;
@@ -270,9 +373,7 @@ int	_ft_printf(const char *str, va_list ap)
 			p.str++;
 			if (!collector_driver(&p))
 				break;
-			//printf("type: %d\n", p.type);
-			if (print_table[p.type -1](&p))
-				continue;
+			 print_table[p.type -1](&p);
 		}
 		else
 		{
@@ -295,7 +396,8 @@ int	ft_printf(const char *str, ...)
 	return (done);
 }
 int main(void){
-	char c = 'a';
-	printf("%d\n", ft_printf("hi low hello |%c|\n", c));
-	printf("%d\n", printf("hi low hello |%c|\n", c));
+	char *s = NULL;
+	char c = '\0';
+	printf("p return %d\n", ft_printf("hi low hello |%-10c|\n", c));
+	printf("p return %d\n", printf("hi low hello |%-10c|\n",c));
 }
