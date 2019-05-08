@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/24 13:41:48 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/07 21:05:28 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/08 15:00:18 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ jumper put_table[2] = {put_a, put_hello};
 
 #define	_VALID_FLAGS	"-+ 0#"
 #define	_VALID_SIZE "hlfFL"
-#define	_VALID_TYPES "cpsdiouxXf"
+#define	_VALID_TYPES "cs%pdiouxXf"
 
 typedef struct s_print
 {
@@ -184,28 +184,14 @@ int	collect_flag(t_print *p)
 
 int	collect_type(t_print *p)
 {
+	char *ref;
+
 	if (p->type)
 		return (0);
-	else if (*p->str == 'c')
-		return (p->type |= _T_C);
-	else if (*p->str == 's')
-		return (p->type |= _T_S);
-	else if (*p->str == 'p')
-		return (p->type |= _T_P);
-	else if (*p->str == 'd')
-		return (p->type |= _T_D);
-	else if (*p->str == 'i')
-		return (p->type |= _T_I);
-	else if (*p->str == 'o')
-		return (p->type |= _T_O);
-	else if (*p->str == 'u')
-		return (p->type |= _T_U);
-	else if (*p->str == 'x')
-		return (p->type |= _T_LX);
-	else if (*p->str == 'X')
-		return (p->type |= _T_UX);
-	else if (*p->str == 'f')
-		return (p->type |= _T_F);
+	if (!(ref = ft_strchr(_VALID_TYPES, *p->str)))
+		return (0);
+	else 
+		return (p->type = (int)(ref - _VALID_TYPES) + 1);
 	return (0);
 }
 
@@ -350,15 +336,26 @@ void	print_str(t_print *p)
 	else
 		ft_putstr(s);
 }
-	
+
+void	print_mod(t_print *p)
+{
+	p->done += (p->width) ? (p->width) : 1;
+	if (p->flag & _F_MINUS)
+		print_char_(ft_putchar, '%', p->width, 1);
+	else if (p->width)
+		print_char_(ft_putchar, '%', p->width, 0);
+	else
+		ft_putchar('%');
+}
+
 typedef void		jump_table(t_print *p);
 jump_table *print_table[] = {
 	print_char,
-	print_str
+	print_str,
+	print_mod
 };
 
-
-int	_ft_printf(const char *str, va_list ap)
+int	ft_printf_(const char *str, va_list ap)
 {
 	t_print p;
 
@@ -368,6 +365,7 @@ int	_ft_printf(const char *str, va_list ap)
 	p.str = str;
 	while (*p.str)
 	{
+		reset_collector(&p);
 		if (*p.str == '%')
 		{
 			p.str++;
@@ -391,13 +389,17 @@ int	ft_printf(const char *str, ...)
 	int done;
 
 	va_start (ap, str);
-	done = _ft_printf(str, ap);
+	done = ft_printf_(str, ap);
 	va_end(ap);
 	return (done);
 }
 int main(void){
 	char *s = NULL;
 	char c = '\0';
-	printf("p return %d\n", ft_printf("hi low hello |%-10c|\n", c));
-	printf("p return %d\n", printf("hi low hello |%-10c|\n",c));
+	printf("p return %d\n", ft_printf("hi low hello |%-10%| %c\n", c));
+	printf("p return %d\n", printf("hi low hello |%-10%| %c\n", c));
+	int len = ft_strcspn(_VALID_TYPES, "%z");
+
+
+
 }
