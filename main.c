@@ -6,14 +6,15 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/24 13:41:48 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/08 15:00:18 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/08 19:47:44 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdarg.h>
 #include <stdio.h>
 #include "libft.h"
-
+#include <stddef.h>
+#include <limits.h>
 /*
 ** -----------------------------===[SYNTAX]===--------------------------------|
 ** %[parameters][flags][width][.precision][size]type
@@ -113,19 +114,12 @@
 ** |-----------+---------------------------------------------------------------|
 */
 
-void	ft_putchar(char c) { write(1, &c, 1); }
 // To Do List:
-// Learn Dispatch Table to improve coding skills and structure handling.
+// Learn Dispatch Table to improve coding skills and structure handling✓.
 // Study Exam Questions✓;
 // Create struct to collect flags ✓; 
-// Create a function pointers to handle width;
-typedef void (*jumper) ();
-void	put_a(void) {ft_putchar('a');}
-void	put_hello(void) {ft_putstr("hello");}
-
-
-jumper put_table[2] = {put_a, put_hello};
-
+// Create a function pointers to handle width✓;
+// Collect size;
 
 #define _F_MINUS	(1U << 0U)
 #define _F_PLUS		(1U << 1U)
@@ -171,30 +165,34 @@ int	collect_flag(t_print *p)
 {
 	if (*p->str == '-')
 		return (p->flag |= _F_MINUS);
-	else if (*p->str == '+')
+	if (*p->str == '+')
 		return (p->flag |= _F_PLUS);
-	else if (*p->str == ' ')
+	if (*p->str == ' ')
 		return (p->flag |= _F_SPACE);
-	else if (*p->str == '0')
+	if (*p->str == '0')
 		return (p->flag |= _F_ZERO);
-	else if (*p->str == '#')
+	if (*p->str == '#')
 		return (p->flag |= _F_HASH);	
 	return (0);
 }
 
-int	collect_type(t_print *p)
+int	collect_size(t_print *p)
 {
-	char *ref;
-
-	if (p->type)
+	if (p->size)
 		return (0);
-	if (!(ref = ft_strchr(_VALID_TYPES, *p->str)))
-		return (0);
-	else 
-		return (p->type = (int)(ref - _VALID_TYPES) + 1);
+	if (*p->str == 'h' && *(p->str + 1) != 'h')
+		return (p->size |= _S_H);
+	if (*p->str == 'h' && *(p->str++) == 'h')
+		return (p->size |= _S_HH);
+	if (*p->str == 'l' && *(p->str + 1) != 'l')
+		return (p->size |= _S_L);
+	if (*p->str == 'l' && *(p->str++) == 'l')
+		return (p->size |= _S_LL);
+	if (*p->str == 'L')
+		return (p->size |= _S_LF);
 	return (0);
 }
-
+	
 int	collect_width(t_print *p)
 {
 	if (ft_isdigit(*p->str))
@@ -225,26 +223,34 @@ int	collect_pcn(t_print *p)
 		return (p->pcn = va_arg(p->ap, int));
 	return (0);
 }
-		
+
+int	collect_type(t_print *p)
+{
+	char *ref;
+	if (p->type)
+		return (0);
+	if (!(ref = ft_strchr(_VALID_TYPES, *p->str)))
+		return (0);
+	else 
+		return (p->type = (ptrdiff_t)(ref - _VALID_TYPES) + 1);
+	return (0);
+}	
 	
 int	collector_driver(t_print *p)
 {
 	while (collect_flag(p))
 		p->str++;
 //	printf("\nAfter collect flag: %c\n", *p->str);
-	while (collect_width(p))
-		p->str++;
-//	printf("\nAfter collect width: %c\n", *p->str);
-	while (collect_pcn(p))
-		p->str++;
-//	printf("\nAfter collect pcn: %c\n", *p->str);
-	while (collect_type(p))
-		p->str++;
-//	printf("\nflag: %d width: %d pcn: %d type: %d \n", p->flag, p->width, p->pcn, p->type);
+	(collect_width(p)) && p->str++;
+	(collect_pcn(p)) && p->str++;
+	(collect_size(p)) && p->str++;
+	(collect_type(p)) && p->str++;
+	printf("\nflag: %d width: %d pcn: %d size: %d type: %d \n", p->flag, p->width, p->pcn, p->size, p->type);
 	if (!p->type)
 		return (0);
 	return (1);
 }
+
 void	init_print(t_print *p)
 {
 	p->flag = 0;
@@ -287,6 +293,9 @@ void	print_char(t_print *p)
 
 	c = va_arg(p->ap, int);
 	p->done += (p->width) ? (p->width) : 1;
+	printf("done: %u\n", p->done);
+	if ((p->done) >= INT_MAX)
+		return;
 	if (p->flag & _F_MINUS)
 		print_char_(ft_putchar, c, p->width, 1);
 	else if (p->width)
@@ -319,14 +328,17 @@ void	print_str_(void	print(const char *), char *s, int space, int flag)
 
 void	print_str(t_print *p)
 {
-	int	space;
-	int len;
+	unsigned int	space;
+	unsigned int len;
 	char	*s;
 
 	s = va_arg(p->ap, char *);
 	len = (s) ? ft_strlen(s) : 6;
 	space = (len > p->width) ? 0 : (p->width - len);
 	p->done += (space) ? (space + len) : len;
+	printf("done string: %u\n", p->done);
+	if ((p->done) >= INT_MAX)
+		return;
 	if (p->flag & _F_MINUS)
 		print_str_(ft_putstr, s, space, 1);
 	else if (space)
@@ -372,11 +384,16 @@ int	ft_printf_(const char *str, va_list ap)
 			if (!collector_driver(&p))
 				break;
 			 print_table[p.type -1](&p);
+			 printf("pdone: %u\n", p.done);
+			 if (p.done > INT_MAX)
+				 return (-1);
 		}
 		else
 		{
-			ft_putchar(*p.str++);
 			p.done++;
+			if (p.done > INT_MAX)
+				return (-1);
+			ft_putchar(*p.str++);
 		}
 	}	
 	va_end (p.ap);
@@ -393,13 +410,11 @@ int	ft_printf(const char *str, ...)
 	va_end(ap);
 	return (done);
 }
+
+
 int main(void){
 	char *s = NULL;
-	char c = '\0';
-	printf("p return %d\n", ft_printf("hi low hello |%-10%| %c\n", c));
-	printf("p return %d\n", printf("hi low hello |%-10%| %c\n", c));
-	int len = ft_strcspn(_VALID_TYPES, "%z");
-
-
-
+	char c = 'a';
+	printf("p return %d\n", ft_printf("%2147483646s\n",s));
+	printf("p return %d\n", printf("%2147483647s\n",s));
 }
