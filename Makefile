@@ -6,7 +6,7 @@
 #    By: phtruong <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/05 21:46:13 by phtruong          #+#    #+#              #
-#    Updated: 2019/05/01 20:28:42 by phtruong         ###   ########.fr        #
+#    Updated: 2019/05/09 20:00:16 by phtruong         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 DEFAULT:=\033[39m
@@ -31,7 +31,7 @@ CC := gcc
 NAME := libftprintf.a
 CFLAGS := -Werror -Wall -Wextra
 
-src := main.c ft_putstr.c ft_putstr_fd.c ft_strlen.c ft_putchar.c ft_putchar_fd.c ft_strchr.c
+src := ft_putstr.c ft_putstr_fd.c ft_strlen.c ft_putchar.c ft_putchar_fd.c ft_strchr.c ft_isdigit.c ft_atoi.c ft_isspace.c ft_strcspn.c
 no_files := $(words ${src})
 obj := ${src:.c=.o}
 HEADER := NO
