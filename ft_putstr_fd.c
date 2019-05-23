@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/20 12:05:37 by phtruong          #+#    #+#             */
-/*   Updated: 2019/04/24 17:40:22 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/20 14:41:46 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
 
 #include "libft.h"
 
-void	ft_putstr_fd(char const *s, int fd)
+ssize_t	ft_putstr_fd(char const *s, int fd)
 {
 	if (!s)
-		return ;
-	write(fd, s, ft_strlen(s));
+		return (-1);
+	return write(fd, s, ft_strlen(s));
 }

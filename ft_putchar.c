@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/20 10:44:54 by phtruong          #+#    #+#             */
-/*   Updated: 2019/02/20 12:32:05 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/20 14:41:00 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 #include "libft.h"
 
-void	ft_putchar(char c)
+ssize_t	ft_putchar(char c)
 {
-	ft_putchar_fd(c, 1);
+	return ft_putchar_fd(c, 1);
 }

@@ -6,7 +6,7 @@
 #    By: phtruong <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/05 21:46:13 by phtruong          #+#    #+#              #
-#    Updated: 2019/05/09 20:00:16 by phtruong         ###   ########.fr        #
+#    Updated: 2019/05/22 18:54:18 by phtruong         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 DEFAULT:=\033[39m
@@ -31,7 +31,9 @@ CC := gcc
 NAME := libftprintf.a
 CFLAGS := -Werror -Wall -Wextra
 
-src := ft_putstr.c ft_putstr_fd.c ft_strlen.c ft_putchar.c ft_putchar_fd.c ft_strchr.c ft_isdigit.c ft_atoi.c ft_isspace.c ft_strcspn.c
+src :=	ft_putstr.c ft_putstr_fd.c ft_strlen.c ft_putchar.c ft_putchar_fd.c ft_strchr.c \
+		ft_isdigit.c ft_atoi.c ft_isspace.c ft_strcspn.c ft_printf_util.c print_nbr_driver.c \
+		print_nbr_util_1.c print_nbr_util_2.c main.c
 no_files := $(words ${src})
 obj := ${src:.c=.o}
 HEADER := NO
@@ -61,7 +63,7 @@ $(NAME): $(obj)
 		echo "${NC}"; \
 		$(eval HEADER = YES) \
 	fi
-	@$(CC) $(CFLAGS) -c $< -o  $@
+	@$(CC) $(CFLAGS) -c $< -o  $@ -I.
 	$(eval COLOR_NUM = $(shell echo ${X} + $$RANDOM % ${DIFF} | bc))
 	@echo "${LCYAN}Compiling🍩:${NC}   \033[38;5;${COLOR_NUM}m\033[0K[$<]${NC} \
 	Progress: ${COUNT} out of ${no_files}"

@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/12 14:40:25 by phtruong          #+#    #+#             */
-/*   Updated: 2019/04/03 14:21:50 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/20 14:42:13 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 # include <stdlib.h>
 # include <stdio.h>
+# include <stdarg.h>
+# include <stddef.h>
+# include <limits.h>
 # include <unistd.h>
 # include <string.h>
 # include <fcntl.h>
@@ -120,10 +123,10 @@ char				*ft_itoa(int n);
 ** Stdio lib
 */
 
-void				ft_putchar(char c);
-void				ft_putchar_fd(char c, int fd);
-void				ft_putstr(char const *c);
-void				ft_putstr_fd(char const *s, int fd);
+ssize_t					ft_putchar(char c);
+ssize_t				ft_putchar_fd(char c, int fd);
+ssize_t				ft_putstr(char const *c);
+ssize_t				ft_putstr_fd(char const *s, int fd);
 void				ft_putendl(char const *s);
 void				ft_putendl_fd(char const *s, int fd);
 void				ft_putnbr(int n);
