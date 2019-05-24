@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_nbr_util.c                                   :+:      :+:    :+:   */
+/*   print_nbr_util_1.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/05/22 18:25:20 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/22 18:30:45 by phtruong         ###   ########.fr       */
+/*   Created: 2019/05/23 19:43:10 by phtruong          #+#    #+#             */
+/*   Updated: 2019/05/23 20:23:38 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	print_nbr_prototype(t_print *p, intmax_t n)
 	(!n && !p->pcn && p->flag & _F_PCN) ? 0 : print_uintmax(n);
 }
 
-int	get_nbr_space(t_print *p, intmax_t n, int pads)
+int		get_nbr_space(t_print *p, intmax_t n, int pads)
 {
 	int space;
 	int len;

@@ -6,13 +6,13 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/22 18:47:34 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/22 19:47:34 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/23 20:26:49 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	flag_to_index(int flag)
+int			flag_to_index(int flag)
 {
 	int i;
 
@@ -22,12 +22,12 @@ int	flag_to_index(int flag)
 		flag >>= 1;
 		i++;
 		if (!flag)
-			break;
+			break ;
 	}
 	return (i);
 }
 
-int	get_nbr_len(uintmax_t n)
+int			get_nbr_len(uintmax_t n)
 {
 	int len;
 
@@ -42,13 +42,16 @@ int	get_nbr_len(uintmax_t n)
 	return (len);
 }
 
-void	print_uintmax(uintmax_t n)
+intmax_t	print_nbr_getsize_arg(t_print *p)
 {
-	if (n >= 10)
-	{
-		print_uintmax(n / 10);
-		ft_putchar(n % 10 + '0');
-	}
-	else
-		ft_putchar(n % 10 + '0');
+	intmax_t	n;
+	va_list		ap;
+	int			tmp;
+
+	tmp = p->argv;
+	va_copy(ap, p->ap);
+	while (tmp-- > 0)
+		n = g_signed_tab[flag_to_index(p->size)](ap);
+	va_end(ap);
+	return (n);
 }
