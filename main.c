@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/24 13:41:48 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/22 20:38:28 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/24 15:39:01 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,93 +137,7 @@ int	collect_argv(t_print *p)
 		p->str++;
 	return (1);
 }
-int	collect_flag(t_print *p) 
-{
-	if (*p->str == '-')
-		return (p->flag |= _F_MINUS);
-	if (*p->str == '+')
-		return (p->flag |= _F_PLUS);
-	if (*p->str == ' ')
-		return (p->flag |= _F_SPACE);
-	if (*p->str == '0')
-		return (p->flag |= _F_ZERO);
-	if (*p->str == '#')
-		return (p->flag |= _F_HASH);	
-	return (0);
-}
 
-int	collect_size(t_print *p)
-{
-	if (p->size)
-		return (0);
-	if (*p->str == 'h' && *(p->str + 1) != 'h')
-		return (p->size |= _S_H);
-	if (*p->str == 'h' && *(p->str++) == 'h')
-		return (p->size |= _S_HH);
-	if (*p->str == 'l' && *(p->str + 1) != 'l')
-		return (p->size |= _S_L);
-	if (*p->str == 'l' && *(p->str++) == 'l')
-		return (p->size |= _S_LL);
-	if (*p->str == 'L')
-		return (p->size |= _S_LF);
-	if (*p->str == 'z')
-		return (p->size |= _S_Z);
-	if (*p->str == 'j')
-		return (p->size |= _S_J);
-	if (*p->str == 't')
-		return (p->size |= _S_T);
-	return (0);
-}
-	
-int	collect_width(t_print *p)
-{
-	if (ft_isdigit(*p->str))
-	{
-		p->width = ft_atoi(p->str);
-		while (ft_isdigit(*p->str))
-			p->str++;
-		p->str--;
-		return (1);
-	}
-	else if (*p->str == '*')
-	{
-		p->width = va_arg(p->ap, int);
-		(p->width < 0) && (p->flag |= _F_MINUS);
-		return (1);
-	}
-	return (0);
-}
-
-int	collect_pcn(t_print *p)
-{
-	(*p->str == '.') && (p->flag |= _F_PCN);
-	(*p->str == '.') && p->str++;
-	if (ft_isdigit(*p->str))
-	{
-		p->pcn = ft_atoi(p->str);
-		while (ft_isdigit(*p->str))
-			p->str++;
-		p->str--;
-		return (1);
-	}
-	else if (*p->str == '*')
-		return (p->pcn = va_arg(p->ap, int));
-	return (0);
-}
-
-int	collect_type(t_print *p)
-{
-	char *ref;
-
-	if (p->type || !*p->str)
-		return (0);
-	if (!(ref = ft_strchr(_VALID_TYPES, *p->str)))
-		return (0);
-	else 
-		return (p->type = (ptrdiff_t)(ref - _VALID_TYPES) + 1);
-	return (0);
-}	
-	
 int	collector_driver(t_print *p)
 {
 	(collect_argv(p)) && p->str++;
@@ -276,247 +190,11 @@ void	print_char(t_print *p)
 	print_char_(p, c);
 }
 
-void	print_str_pcn(t_print *p, char *s, int space)
-{
-	int len;
-	char c;
-
-	c = (p->flag & _F_ZERO && !(p->flag & _F_MINUS)) ? '0' : ' ';
-	len = ft_strlen(s);
-	if (p->flag & _F_MINUS)
-	{
-		while (p->pcn-- && len--)
-			ft_putchar(*s++);
-		put_nchar(c, space);
-	}
-	else if (!(p->flag & _F_MINUS))
-	{
-		put_nchar(c, space);
-		while (p->pcn-- && len--)
-			ft_putchar(*s++);
-	}
-}
-
-void	print_str_(t_print *p, char *s, int space)
-{
-	char c;
-
-	c = (p->flag & _F_ZERO && !(p->flag & _F_MINUS)) ? '0' : ' ';
-	(!s) &&	(s = "(null)");
-	if (p->flag & _F_PCN)
-		print_str_pcn(p, s, space);
-	else
-	{
-		if (!(p->flag & _F_MINUS))
-			put_nchar(c, space);
-		ft_putstr(s);
-		if (p->flag & _F_MINUS)
-			put_nchar(c, space);
-	}
-}
-
-char	*get_str_argv(t_print *p)
-{
-	va_list		ap;
-	int			tmp;
-	char		*s;
-
-	tmp = p->argv;
-	va_copy(ap, p->ap);
-	while (tmp-- > 0)
-		s = va_arg(ap, char *);
-	va_end(ap);
-	return (s);
-}	
-
-void	print_str(t_print *p)
-{
-	int	space;
-	int	len;
-	char			*s;
-
-	s = (p->argv) ? get_str_argv(p) : va_arg(p->ap, char *);
-	len = (s) ? ft_strlen(s) : 6;
-	space = get_nspace(p, len);
-	if (!(p->flag & _F_PCN))
-		p->done += (len + space);
-	else if (p->flag & _F_PCN)
-		p->done += (p->pcn > len) ? (len + space) : (p->pcn + space);
-	if ((p->done) >= INT_MAX)
-		return;
-	print_str_(p, s, space);
-}
 
 void	print_mod(t_print *p)
 {
 	p->done += (p->width) ? (p->width) : 1;
 	print_char_(p, '%');
-}
-
-intmax_t	print_nbr_nosize(t_print *p)
-{
-	intmax_t n;
-
-	n = va_arg(p->ap, int);
-	return (n);
-}
-
-intmax_t	print_nbr_nosize_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = va_arg(ap, int);
-	return (n);
-}
-
-intmax_t	print_nbr_sizeh(t_print *p)
-{
-	intmax_t n;
-	
-	n = (short)(va_arg(p->ap, int));
-	return (n);
-}
-
-intmax_t	print_nbr_sizeh_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = (short)va_arg(ap, int);
-	return (n);
-}
-
-intmax_t	print_nbr_sizehh(t_print *p)
-{
-	intmax_t n;
-
-	n = (char)(va_arg(p->ap, int));
-	return (n);
-}
-
-intmax_t	print_nbr_sizehh_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = (char)(va_arg(ap, int));
-	return (n);
-}
-
-intmax_t	print_nbr_sizel(t_print *p)
-{
-	intmax_t n;
-
-	n = va_arg(p->ap, long int);
-	return (n);
-}
-
-intmax_t	print_nbr_sizel_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = va_arg(ap, long int);
-	return (n);
-}
-
-intmax_t	print_nbr_sizell(t_print *p)
-{
-	intmax_t n;
-
-	n = va_arg(p->ap, long long int);
-	return (n);
-}
-
-intmax_t	print_nbr_sizell_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = va_arg(ap, long long int);
-	return (n);
-}
-
-intmax_t	print_nbr_sizelf(t_print *p)
-{
-	intmax_t n;
-
-	n = va_arg(p->ap, int);
-	return (n);
-}
-
-intmax_t	print_nbr_sizelf_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = va_arg(ap, int);
-	return (n);
-}
-
-intmax_t	print_nbr_sizej(t_print *p)
-{
-	intmax_t n;
-
-	n = va_arg(p->ap, intmax_t);
-	return (n);
-}
-
-intmax_t	print_nbr_sizej_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = va_arg(ap, intmax_t);
-	return (n);
-}
-
-intmax_t	print_nbr_sizez(t_print *p)
-{
-	intmax_t n;
-
-	n = va_arg(p->ap, size_t);
-	return (n);
-}
-
-intmax_t	print_nbr_sizez_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = va_arg(ap, size_t);
-	return (n);
-}
-
-intmax_t	print_nbr_sizet(t_print *p)
-{
-	intmax_t n;
-
-	n = va_arg(p->ap, ssize_t);
-	return (n);
-}
-
-intmax_t	print_nbr_sizet_arg(va_list ap)
-{
-	intmax_t n;
-
-	n = va_arg(ap, ssize_t);
-	return (n);
-}
-
-intmax_t	print_nbr_getsize(t_print *p)
-{
-	intmax_t n;
-
-	n = g_signed_tab[flag_to_index(p->size)](p); 
-	return (n);
-}
-
-intmax_t	print_nbr_getsize_arg(t_print *p)
-{
-	intmax_t n;
-	va_list ap;
-	int		tmp;
-
-	tmp = p->argv;
-	va_copy(ap, p->ap);
-	while (tmp-- > 0)
-		n = g_signed_tab_arg[flag_to_index(p->size)](ap);
-	va_end(ap);
-	return (n);
 }
 
 void print_nbr(t_print *p)
@@ -539,6 +217,98 @@ void print_nbr(t_print *p)
 	else if (n >= 0 && (p->flag & _F_PLUS || p->flag & _F_SPACE))
 		p->done++;
 	print_nbr_driver(p, n, space, pads);
+}
+
+void	print_unbr(t_print *p)
+{
+	uintmax_t n;
+	int len;
+	int space;
+	int pads;
+	
+	n = (p->argv) ? print_unbr_getsize_arg(p) : print_unbr_getsize(p);
+	len = get_nbr_len(n);
+	(!n && !p->pcn && p->flag & _F_PCN) && (len = 0);
+	pads = (p->pcn > len) ? (p->pcn - len) : 0;
+	space = get_nbr_space(p, n, pads);
+	p->done += (space + pads + len);
+	if (p->done >= INT_MAX)
+		return ;
+	if (n >= 0 && (p->flag & _F_PLUS || p->flag & _F_SPACE))
+		p->done++;
+	print_unbr_driver(p, n, space, pads);
+}
+
+uintmax_t print_unbr_nosize(va_list ap)
+{
+	uintmax_t n;
+
+	n = va_arg(ap, unsigned int);
+	return (n);
+}
+
+uintmax_t	print_unbr_sizeh(va_list ap)
+{
+	uintmax_t n;
+	
+	n = (unsigned short)(va_arg(ap, unsigned int));
+	return (n);
+}
+
+uintmax_t	print_unbr_sizehh(va_list ap)
+{
+	uintmax_t n;
+
+	n = (unsigned char)(va_arg(ap, unsigned int));
+	return (n);
+}
+
+uintmax_t	print_unbr_sizel(va_list ap)
+{
+	uintmax_t n;
+
+	n = va_arg(ap, unsigned long int);
+	return (n);
+}
+
+uintmax_t	print_unbr_sizell(va_list ap)
+{
+	uintmax_t n;
+
+	n = va_arg(ap, unsigned long long int);
+	return (n);
+}
+
+uintmax_t	print_unbr_sizelf(va_list ap)
+{
+	uintmax_t n;
+
+	n = va_arg(ap, unsigned int);
+	return (n);
+}
+
+uintmax_t	print_unbr_sizej(va_list ap)
+{
+	uintmax_t n;
+
+	n = va_arg(ap, uintmax_t);
+	return (n);
+}
+
+uintmax_t	print_unbr_sizez(va_list ap)
+{
+	uintmax_t n;
+
+	n = va_arg(ap, size_t);
+	return (n);
+}
+
+uintmax_t	print_unbr_sizet(va_list ap)
+{
+	uintmax_t n;
+
+	n = va_arg(ap, ssize_t);
+	return (n);
 }
 
 int	ft_printf_con(t_print *p)
@@ -595,9 +365,9 @@ int	ft_printf(const char *str, ...)
 	return (done);
 }
 
-
+/*
 int main(void)
-{/*
+{
 	int n = 0;
 	printf("-------------------------------------BASICS---------------------------------------\n");
 	printf("For int n: %d\n", n);
@@ -698,17 +468,37 @@ int main(void)
 	printf("ft_printf: %d vs %d :printf #96\n",ft_printf("|%+-1.d|\t", n),	printf("|%+-1.d|\t", n));
 	printf("ft_printf: %d vs %d :printf #97\n",ft_printf("|%+-2.d|\t", n),	printf("|%+-2.d|\t", n));
 	printf("ft_printf: %d vs %d :printf #98\n",ft_printf("|%+-3.d|\t", n),	printf("|%+-3.d|\t", n));
-	printf("ft_printf: %d vs %d :printf #99\n",ft_printf("|%+-4.d|\t", n),	printf("|%+-4.d|\t", n));*/
-/*	printf("-------------------------------------SIZE_RELATED---------------------------------\n");
+	printf("ft_printf: %d vs %d :printf #99\n",ft_printf("|%+-4.d|\t", n),	printf("|%+-4.d|\t", n));
+	printf("-------------------------------------SIZE_RELATED---------------------------------\n");
 	printf("For char (size z): %zd\n", 128);
 	size_t t= UINT_MAX;
-	printf("ft_printf: %d vs %d :printf #1\n",ft_printf("|%Ld|\t", t),		printf("|%Ld|\t", t));*/
-	printf("------------------------------------ARG_RELATED-----------------------------------\n");
-	printf("ft_prinf: %d vs %d :printf #1\n", ft_printf("%3$d, %2$d, %1$d \t", 1, 2, 3), printf("%3$d, %2$d, %1$d \t", 1, 2, 3));
-	printf("ft_prinf: %d vs %d :printf #1\n", ft_printf("%2$d, %3$d, %1$d \t", 1, 2, 3), printf("%2$d, %3$d, %1$d \t", 1, 2, 3));
-	printf("ft_prinf: %d vs %d :printf #1\n", ft_printf("%1$d, %3$d, %2$d \t", 1, 2, 3), printf("%1$d, %3$d, %2$d \t", 1, 2, 3));
-	printf("ft_prinf: %d vs %d :printf #1\n", ft_printf("%3$d, %2$d, %2$d \t", 1, 2, 3), printf("%3$d, %2$d, %2$d \t", 1, 2, 3));
-//	printf("ft_prinf: %d vs %d :printf #1\n", ft_printf("%3$s, %2$s, %1$s \t", "hi", "low", "hello"), printf("%3$s, %2$s, %1$s \t", "hi", "low", "hello"));
-	
+	printf("ft_printf: %d vs %d :printf #1\n",ft_printf("|%Ld|\t", t),		printf("|%Ld|\t", t));
+	printf("------------------------------------ARG_BONUS-----------------------------------\n");
+	printf("NUMBER RELATED\n");
+	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%3$d, %2$d, %1$d \t", 1, 2, 3), printf("%3$d, %2$d, %1$d \t", 1, 2, 3));
+	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("%2$d, %3$d, %1$d \t", 1, 2, 3), printf("%2$d, %3$d, %1$d \t", 1, 2, 3));
+	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("%1$d, %3$d, %2$d \t", 1, 2, 3), printf("%1$d, %3$d, %2$d \t", 1, 2, 3));
+	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("%3$d, %2$d, %2$d \t", 1, 2, 3), printf("%3$d, %2$d, %2$d \t", 1, 2, 3));
+	printf("STRING RELATED\n");
+	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%3$s, %2$s, %1$s \t", "hi", "low", "hello"), printf("%3$s, %2$s, %1$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("%2$s, %3$s, %1$s \t", "hi", "low", "hello"), printf("%2$s, %3$s, %1$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("%1$s, %2$s, %3$s \t", "hi", "low", "hello"), printf("%1$s, %2$s, %3$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("%2$s, %2$s, %1$s \t", "hi", "low", "hello"), printf("%2$s, %2$s, %1$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #5\n", ft_printf("%3$s, %2$s, %3$s \t", "hi", "low", "hello"), printf("%3$s, %2$s, %3$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #6\n", ft_printf("%3$s, %2$s, %1$s \t", "hi", "low", "hello"), printf("%3$s, %2$s, %1$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #7\n", ft_printf("%1$s, %2$s, %1$s \t", "hi", "low", "hello"), printf("%1$s, %2$s, %1$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #8\n", ft_printf("%3$s, %3$s, %3$s \t", "hi", "low", "hello"), printf("%3$s, %3$s, %3$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #9\n", ft_printf("%2$s, %2$s, %1$s \t", "hi", "low", "hello"), printf("%2$s, %2$s, %1$s \t", "hi", "low", "hello"));
+	printf("ft_printf: %d vs %d :printf #10\n", ft_printf("%2$s, %2$s, %3$s \t", "hi", "low", "hello"), printf("%2$s, %2$s, %3$s \t", "hi", "low", "hello"));
+	printf("------------------------------------STAR_BONUS------------------------------------\n");
+	int width = -5;
+	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("|%*d| \t", width, 123), printf("|%*d| \t", width, 123));
+	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("|%+*d| \t", width, 123), printf("|%+*d| \t", width, 123));
+	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("|%-*d| \t", width, 123), printf("|%-*d| \t", width, 123));
+	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("|%+-*d| \t", width, 123), printf("|%+-*d| \t", width, 123));
+	printf("ft_printf: %d vs %d :printf #5\n", ft_printf("|%0*d| \t", width, 123), printf("|%0*d| \t", width, 123));
+	printf("ft_printf: %d vs %d :printf #6\n", ft_printf("|%+0*d| \t", width, 123), printf("|%+0*d| \t", width, 123));
+	printf("ft_printf: %d vs %d :printf #7\n", ft_printf("|%+-0*d| \t", width, 123), printf("|%+-0*d| \t", width, 123));
+	//while(1);	
 	return (0);
-}
+}*/
