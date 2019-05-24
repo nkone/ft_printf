@@ -6,27 +6,14 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/22 18:52:04 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/22 20:28:30 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/24 14:55:45 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_printf.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/05/09 19:45:13 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/22 18:43:07 by phtruong         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 
 #ifndef FT_PRINTF_H
 # define FT_PRINTF_H
 
-#include "libft.h"
+# include "libft.h"
 
 # define _F_MINUS	(1U << 0U)
 # define _F_PLUS	(1U << 1U)
@@ -45,7 +32,7 @@
 # define _S_J		(1U << 6U)
 # define _S_T		(1U << 7U)
 
-# define _VALID_TYPES "cs%dipouxXf"
+# define _VALID_TYPES "cs%diuopxXf"
 
 typedef struct		s_print
 {
@@ -60,10 +47,29 @@ typedef struct		s_print
 	va_list			ap;
 }					t_print;
 
+/*
+** print_collector.c
+*/
+
+int					collect_flag(t_print *p);
+int					collect_size(t_print *p);
+int					collect_width(t_print *p);
+int					collect_pcn(t_print *p);
+int					collect_type(t_print *p);
+
 void				print_char(t_print *p);
-void				print_str(t_print *p);
 void				print_mod(t_print *p);
 void				print_nbr(t_print *p);
+void				print_unbr(t_print *p);
+
+/*
+** print_string.c
+*/
+
+void				print_str_pcn(t_print *p, char *s, int space);
+void				print_str_(t_print *p, char *s, int space);
+void				print_str(t_print *p);
+char				*get_str_argv(t_print *p);
 
 typedef void		t_jump(t_print *p);
 
@@ -73,20 +79,31 @@ static	t_jump *g_print_table[] =
 	print_str,
 	print_mod,
 	print_nbr,
-	print_nbr
+	print_nbr,
+	print_unbr
 };
 
-intmax_t			print_nbr_nosize(t_print *p);
-intmax_t			print_nbr_sizeh(t_print *p);	
-intmax_t			print_nbr_sizehh(t_print *p);	
-intmax_t			print_nbr_sizel(t_print *p);	
-intmax_t			print_nbr_sizell(t_print *p);	
-intmax_t			print_nbr_sizelf(t_print *p);
-intmax_t			print_nbr_sizej(t_print *p);
-intmax_t			print_nbr_sizez(t_print *p);
-intmax_t			print_nbr_sizet(t_print *p);
+/*
+** print_nbr_size_1.c
+*/
 
-typedef intmax_t	t_getsize(t_print *p);
+intmax_t			print_nbr_nosize(va_list ap);
+intmax_t			print_nbr_sizeh(va_list ap);
+intmax_t			print_nbr_sizehh(va_list ap);
+intmax_t			print_nbr_sizel(va_list ap);
+intmax_t			print_nbr_sizell(va_list ap);
+
+/*
+** print_nbr_size_2.c
+*/
+
+intmax_t			print_nbr_sizelf(va_list ap);
+intmax_t			print_nbr_sizej(va_list ap);
+intmax_t			print_nbr_sizez(va_list ap);
+intmax_t			print_nbr_sizet(va_list ap);
+intmax_t			print_nbr_getsize(t_print *p);
+
+typedef intmax_t	t_getsize(va_list ap);
 
 static	t_getsize *g_signed_tab[] =
 {
@@ -101,30 +118,30 @@ static	t_getsize *g_signed_tab[] =
 	print_nbr_sizet
 };
 
-intmax_t			print_nbr_nosize_arg(va_list ap);
-intmax_t			print_nbr_sizeh_arg(va_list ap);	
-intmax_t			print_nbr_sizehh_arg(va_list ap);	
-intmax_t			print_nbr_sizel_arg(va_list ap);	
-intmax_t			print_nbr_sizell_arg(va_list ap);	
-intmax_t			print_nbr_sizelf_arg(va_list ap);
-intmax_t			print_nbr_sizej_arg(va_list ap);
-intmax_t			print_nbr_sizez_arg(va_list ap);
-intmax_t			print_nbr_sizet_arg(va_list ap);
+uintmax_t			print_unbr_nosize(va_list ap);
+uintmax_t			print_unbr_sizeh(va_list ap);
+uintmax_t			print_unbr_sizehh(va_list ap);
+uintmax_t			print_unbr_sizel(va_list ap);
+uintmax_t			print_unbr_sizell(va_list ap);
+uintmax_t			print_unbr_sizelf(va_list ap);
+uintmax_t			print_unbr_sizej(va_list ap);
+uintmax_t			print_unbr_sizez(va_list ap);
+uintmax_t			print_unbr_sizet(va_list ap);
 
-typedef	intmax_t	t_getsizearg(va_list ap);
+typedef uintmax_t	t_getusize(va_list ap);
 
-static t_getsizearg *g_signed_tab_arg[] =
+static	t_getusize *g_usigned_tab[] =
 {
-	print_nbr_nosize_arg,
-	print_nbr_sizeh_arg,
-	print_nbr_sizehh_arg,
-	print_nbr_sizel_arg,
-	print_nbr_sizell_arg,
-	print_nbr_sizelf_arg,
-	print_nbr_sizej_arg,
-	print_nbr_sizet_arg
+	print_unbr_nosize,
+	print_unbr_sizeh,
+	print_unbr_sizehh,
+	print_unbr_sizel,
+	print_unbr_sizell,
+	print_unbr_sizelf,
+	print_unbr_sizej,
+	print_unbr_sizez,
+	print_unbr_sizet
 };
-
 
 /*
 ** ft_printf_util.c
@@ -133,10 +150,10 @@ static t_getsizearg *g_signed_tab_arg[] =
 void				reset_print(t_print *p);
 void				reset_collector(t_print *p);
 int					put_nchar(char c, int n);
-int					get_nspace(t_print *p,	int len);
+int					get_nspace(t_print *p, int len);
 
 /*
-** print_nbr_diver.c
+** print_nbr_driver.c
 */
 
 void				print_nbr_case1(t_print *p, intmax_t n);
@@ -151,7 +168,7 @@ void				print_nbr_driver(t_print *p, intmax_t n, int sp, int pads);
 
 int					print_nbr_plus_flag(intmax_t n);
 int					print_nbr_sp_flag(intmax_t n);
-int					get_nbr_space(t_print *p, intmax_t n, int pads);	
+int					get_nbr_space(t_print *p, intmax_t n, int pads);
 void				process_sp_plus_flag(t_print *p, intmax_t n);
 void				print_nbr_prototype(t_print *p, intmax_t n);
 
@@ -161,6 +178,25 @@ void				print_nbr_prototype(t_print *p, intmax_t n);
 
 int					flag_to_index(int flag);
 int					get_nbr_len(uintmax_t n);
+intmax_t			print_nbr_getsize_arg(t_print *p);
+
+/*
+** print_unbr_driver.c
+*/
+
+void				print_unbr_case1(t_print *p, uintmax_t n);
+void				print_unbr_case2(t_print *p, uintmax_t n, int sp);
+void				print_unbr_case3(t_print *p, uintmax_t n, int pads);
+void				print_unbr_case4(t_print *p, uintmax_t n, int sp, int pads);
+void				print_unbr_driver(t_print *p, uintmax_t n, int sp, int pads);
+
+/*
+** print_unbr_util_1.c
+*/
+
 void				print_uintmax(uintmax_t n);
+void				process_sp_plus_flag_unbr(t_print *p);
+uintmax_t			print_unbr_getsize(t_print *p);
+uintmax_t			print_unbr_getsize_arg(t_print *p);
 
 #endif

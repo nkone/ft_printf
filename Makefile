@@ -6,7 +6,7 @@
 #    By: phtruong <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/05 21:46:13 by phtruong          #+#    #+#              #
-#    Updated: 2019/05/22 18:54:18 by phtruong         ###   ########.fr        #
+#    Updated: 2019/05/24 14:56:10 by phtruong         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 DEFAULT:=\033[39m
@@ -33,7 +33,8 @@ CFLAGS := -Werror -Wall -Wextra
 
 src :=	ft_putstr.c ft_putstr_fd.c ft_strlen.c ft_putchar.c ft_putchar_fd.c ft_strchr.c \
 		ft_isdigit.c ft_atoi.c ft_isspace.c ft_strcspn.c ft_printf_util.c print_nbr_driver.c \
-		print_nbr_util_1.c print_nbr_util_2.c main.c
+		print_nbr_util_1.c print_nbr_util_2.c print_nbr_size_1.c print_nbr_size_2.c \
+		print_unbr_util_1.c print_unbr_driver.c print_string.c print_collector.c main.c
 no_files := $(words ${src})
 obj := ${src:.c=.o}
 HEADER := NO
