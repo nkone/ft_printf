@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/22 18:52:04 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/24 14:55:45 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/26 14:03:25 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 # define _S_J		(1U << 6U)
 # define _S_T		(1U << 7U)
 
-# define _VALID_TYPES "cs%diuopxXf"
+# define _VALID_TYPES "cs%diuropxXf"
 
 typedef struct		s_print
 {
@@ -61,6 +61,7 @@ void				print_char(t_print *p);
 void				print_mod(t_print *p);
 void				print_nbr(t_print *p);
 void				print_unbr(t_print *p);
+void				print_unbr_base2(t_print *p);
 
 /*
 ** print_string.c
@@ -80,7 +81,8 @@ static	t_jump *g_print_table[] =
 	print_mod,
 	print_nbr,
 	print_nbr,
-	print_unbr
+	print_unbr,
+	print_unbr_base2
 };
 
 /*
@@ -118,11 +120,20 @@ static	t_getsize *g_signed_tab[] =
 	print_nbr_sizet
 };
 
+/*
+** print_unbr_size_1.c
+*/
+
 uintmax_t			print_unbr_nosize(va_list ap);
 uintmax_t			print_unbr_sizeh(va_list ap);
 uintmax_t			print_unbr_sizehh(va_list ap);
 uintmax_t			print_unbr_sizel(va_list ap);
 uintmax_t			print_unbr_sizell(va_list ap);
+
+/*
+** print_unbr_size_2.c
+*/
+
 uintmax_t			print_unbr_sizelf(va_list ap);
 uintmax_t			print_unbr_sizej(va_list ap);
 uintmax_t			print_unbr_sizez(va_list ap);
@@ -196,7 +207,7 @@ void				print_unbr_driver(t_print *p, uintmax_t n, int sp, int pads);
 
 void				print_uintmax(uintmax_t n);
 void				process_sp_plus_flag_unbr(t_print *p);
+int					get_unbr_space(t_print *p, uintmax_t n, int pads, int len);
 uintmax_t			print_unbr_getsize(t_print *p);
 uintmax_t			print_unbr_getsize_arg(t_print *p);
-
 #endif
