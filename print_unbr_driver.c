@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 14:31:12 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/24 14:31:22 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/26 17:51:46 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	print_unbr_case2(t_print *p, uintmax_t n, int space)
 
 void	print_unbr_case3(t_print *p, uintmax_t n, int pads)
 {
-	process_sp_plus_flag(p, n);
+	process_sp_plus_flag_unbr(p);
 	put_nchar('0', pads);
 	(!n && !p->pcn && p->flag & _F_PCN) ? 0 : print_uintmax(n);
 }
