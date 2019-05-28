@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 19:43:10 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/26 14:04:41 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/26 18:20:59 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ int		get_nbr_space(t_print *p, intmax_t n, int pads)
 		else if (n)
 			space = (p->width >= len) ? (p->width - len) : 0;
 		else if (!n)
-			space = (p->width >= len) ? (p->width - len + 1) : 0;
+			space = (p->width >= p->pcn) ? (p->width - p->pcn) : 0;
 	}
 	else
 		space = (p->width > len) ? (p->width - len) : 0;
