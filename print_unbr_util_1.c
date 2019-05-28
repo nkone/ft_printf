@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:54:35 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/26 13:45:34 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/26 18:18:00 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,18 +48,20 @@ uintmax_t	print_unbr_getsize_arg(t_print *p)
 void	process_sp_plus_flag_unbr(t_print *p)
 {
 	if (p->flag & _F_PLUS)
-		ft_putchar('+');
+		return ;	
 	else if (p->flag & _F_SPACE)
-		ft_putchar(' ');
+		return ;
 }
 
-int		get_unbr_space(t_print *p, uintmax_t n, int pads, int len)
+int		get_unbr_space(t_print *p, uintmax_t n, int pads)
 {
 	int space;
+	int len;
 
+	len = get_nbr_len(n);
 	space = 0;
-	if (p->width > 0)
-		(n < 0 || p->flag & _F_PLUS || p->flag & _F_SPACE) && p->width--;
+//	if (p->width > 0)
+//		(n < 0 || p->flag & _F_PLUS || p->flag & _F_SPACE) && p->width--;
 	if (p->flag & _F_PCN)
 	{
 		if (pads)
@@ -67,7 +69,7 @@ int		get_unbr_space(t_print *p, uintmax_t n, int pads, int len)
 		else if (n)
 			space = (p->width >= len) ? (p->width - len) : 0;
 		else if (!n)
-			space = (p->width >= len) ? (p->width - len + 1) : 0;
+			space = (p->width >= p->pcn) ? (p->width - p->pcn) : 0;
 	}
 	else
 		space = (p->width > len) ? (p->width - len) : 0;
