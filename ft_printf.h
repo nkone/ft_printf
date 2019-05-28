@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/22 18:52:04 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/26 14:03:25 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/27 14:33:31 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@
 # define _S_J		(1U << 6U)
 # define _S_T		(1U << 7U)
 
-# define _VALID_TYPES "cs%diuropxXf"
+# define _VALID_TYPES "cs%diuroxXpf"
+# define LOWER_BASE "0123456789abcdef"
+# define UPPER_BASE "0123456789ABCDEF"
 
 typedef struct		s_print
 {
@@ -62,6 +64,7 @@ void				print_mod(t_print *p);
 void				print_nbr(t_print *p);
 void				print_unbr(t_print *p);
 void				print_unbr_base2(t_print *p);
+void				print_unbr_base8(t_print *p);
 
 /*
 ** print_string.c
@@ -82,7 +85,8 @@ static	t_jump *g_print_table[] =
 	print_nbr,
 	print_nbr,
 	print_unbr,
-	print_unbr_base2
+	print_unbr_base2,
+	print_unbr_base8
 };
 
 /*
@@ -169,9 +173,9 @@ int					get_nspace(t_print *p, int len);
 
 void				print_nbr_case1(t_print *p, intmax_t n);
 void				print_nbr_case2(t_print *p, intmax_t n, int sp);
-void				print_nbr_case3(t_print *p, intmax_t n, int pads);
-void				print_nbr_case4(t_print *p, intmax_t n, int sp, int pads);
-void				print_nbr_driver(t_print *p, intmax_t n, int sp, int pads);
+void				print_nbr_case3(t_print *p, intmax_t n, int pd);
+void				print_nbr_case4(t_print *p, intmax_t n, int sp, int pd);
+void				print_nbr_driver(t_print *p, intmax_t n, int sp, int pd);
 
 /*
 ** print_nbr_util_1.c
@@ -179,7 +183,7 @@ void				print_nbr_driver(t_print *p, intmax_t n, int sp, int pads);
 
 int					print_nbr_plus_flag(intmax_t n);
 int					print_nbr_sp_flag(intmax_t n);
-int					get_nbr_space(t_print *p, intmax_t n, int pads);
+int					get_nbr_space(t_print *p, intmax_t n, int pd);
 void				process_sp_plus_flag(t_print *p, intmax_t n);
 void				print_nbr_prototype(t_print *p, intmax_t n);
 
@@ -197,9 +201,9 @@ intmax_t			print_nbr_getsize_arg(t_print *p);
 
 void				print_unbr_case1(t_print *p, uintmax_t n);
 void				print_unbr_case2(t_print *p, uintmax_t n, int sp);
-void				print_unbr_case3(t_print *p, uintmax_t n, int pads);
-void				print_unbr_case4(t_print *p, uintmax_t n, int sp, int pads);
-void				print_unbr_driver(t_print *p, uintmax_t n, int sp, int pads);
+void				print_unbr_case3(t_print *p, uintmax_t n, int pd);
+void				print_unbr_case4(t_print *p, uintmax_t n, int sp, int pd);
+void				print_unbr_driver(t_print *p, uintmax_t n, int sp, int pd);
 
 /*
 ** print_unbr_util_1.c
@@ -207,7 +211,37 @@ void				print_unbr_driver(t_print *p, uintmax_t n, int sp, int pads);
 
 void				print_uintmax(uintmax_t n);
 void				process_sp_plus_flag_unbr(t_print *p);
-int					get_unbr_space(t_print *p, uintmax_t n, int pads, int len);
+int					get_unbr_space(t_print *p, uintmax_t n, int pd);
 uintmax_t			print_unbr_getsize(t_print *p);
 uintmax_t			print_unbr_getsize_arg(t_print *p);
+
+/*
+** print_unbr_util_2.c
+*/
+
+void				print_unbr_base(uintmax_t n, uint8_t base);
+void				print_unbr_prototype(t_print *p, uintmax_t n, uint8_t base);
+void				process_hash_flag(t_print *p, uintmax_t n, uint8_t base);
+int					get_unbr_len_base(uintmax_t n, uint8_t base);
+int					get_unbr_sp_base(t_print *p, uintmax_t n, int d, uint8_t b);
+
+/*
+** print_binary_driver.c
+*/
+
+void				print_base2_case1(t_print *p, uintmax_t n);
+void				print_base2_case2(t_print *p, uintmax_t n, int sp);
+void				print_base2_case3(t_print *p, uintmax_t n, int pd);
+void				print_base2_case4(t_print *p, uintmax_t n, int sp, int pd);
+void				print_base2_driver(t_print *p, uintmax_t n, int sp, int pd);
+
+/*
+** print_octal_driver.c
+*/
+
+void				print_base8_case1(t_print *p, uintmax_t n);
+void				print_base8_case2(t_print *p, uintmax_t n, int sp);
+void				print_base8_case3(t_print *p, uintmax_t n, int pd);
+void				print_base8_case4(t_print *p, uintmax_t n, int sp, int pd);
+void				print_base8_driver(t_print *p, uintmax_t n, int sp, int pd);
 #endif
