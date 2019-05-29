@@ -6,22 +6,25 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/27 10:59:35 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/27 16:59:45 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/28 18:02:21 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-void	print_unbr_base(uintmax_t n, uint8_t base)
+void	print_unbr_base_lo(uintmax_t n, uint8_t base)
 {
 	if (n >= base)
-		print_unbr_base(n/base, base);
+		print_unbr_base_lo(n/base, base);
 	ft_putchar(LOWER_BASE[n % base]);
 }
 
 void	print_unbr_prototype(t_print *p, uintmax_t n, uint8_t base)
 {
-	(!n && p->flag & _F_PCN && !p->pcn) ? 0 : print_unbr_base(n, base);
+	if (p->type == 8 || p->type == 9)
+		(!n && p->flag & _F_PCN && !p->pcn) ? 0 : print_unbr_base_lo(n, base);
+	else if (p->type == 10)
+		(!n && p->flag & _F_PCN && !p->pcn) ? 0 : print_unbr_base_up(n, base);
 }
 
 int		get_unbr_sp_base(t_print *p, uintmax_t n, int pads, uint8_t base)
@@ -61,17 +64,14 @@ int		get_unbr_len_base(uintmax_t n, uint8_t base)
 	return (len);
 }
 
-void	process_hash_flag(t_print *p, uintmax_t n, uint8_t base)
+void	process_hash_flag(t_print *p, uint8_t base)
 {
 	if (!(p->flag & _F_HASH))
 		return ;
-	if (!n && !(p->flag & _F_PCN))
-		return ;
 	else if (p->flag & _F_HASH && (base == 8))
 		p->done += ft_putchar('0');
-	else if (p->flag & _F_HASH && (base == 16) && p->type == 8)
-		ft_putstr("0x");
 	else if (p->flag & _F_HASH && (base == 16) && p->type == 9)
-		ft_putstr("0X");
-	n++;
+		p->done += ft_putstr("0x");
+	else if (p->flag & _F_HASH && (base == 16) && p->type == 10)
+		p->done += ft_putstr("0X");
 }
