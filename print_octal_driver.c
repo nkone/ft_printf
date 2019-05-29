@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/27 13:52:23 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/27 16:53:40 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/05/28 18:12:22 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,15 @@
 
 void	print_base8_case1(t_print *p, uintmax_t n)
 {
-	if (p->pcn && !n)
+	if (!n)
+	{
+		if (p->flag & _F_PCN && !p->pcn)
+			process_hash_flag(p, 8);
 		print_unbr_prototype(p, n, 8);
+	}
 	else
 	{
-		process_hash_flag(p, n, 8);
+		process_hash_flag(p, 8);
 		print_unbr_prototype(p, n, 8);
 	}
 }
@@ -33,11 +37,15 @@ void	print_base8_case2(t_print *p, uintmax_t n, int space)
 	else if (p->flag & _F_ZERO)
 		c = '0';
 	(!(p->flag & _F_MINUS)) && put_nchar(c, space);
-	if (p->pcn && !n)
+	if (!n)
+	{
+		if (p->flag & _F_PCN && !p->pcn)
+			process_hash_flag(p, 8);
 		print_unbr_prototype(p, n, 8);
+	}
 	else
 	{
-		process_hash_flag(p, n, 8);
+		process_hash_flag(p, 8);
 		print_unbr_prototype(p, n, 8);
 	}
 	(p->flag & _F_MINUS) && put_nchar(c, space);
