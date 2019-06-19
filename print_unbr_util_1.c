@@ -6,13 +6,13 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 12:54:35 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/26 18:18:00 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/06/03 11:36:31 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-void	print_uintmax(uintmax_t n)
+void		print_uintmax(uintmax_t n)
 {
 	if (n >= 10)
 	{
@@ -33,9 +33,9 @@ uintmax_t	print_unbr_getsize(t_print *p)
 
 uintmax_t	print_unbr_getsize_arg(t_print *p)
 {
-	va_list ap;
-	int		tmp;
-	uintmax_t n;
+	va_list		ap;
+	int			tmp;
+	uintmax_t	n;
 
 	tmp = p->argv;
 	va_copy(ap, p->ap);
@@ -45,23 +45,21 @@ uintmax_t	print_unbr_getsize_arg(t_print *p)
 	return (n);
 }
 
-void	process_sp_plus_flag_unbr(t_print *p)
+void		process_sp_plus_flag_unbr(t_print *p)
 {
 	if (p->flag & _F_PLUS)
-		return ;	
+		return ;
 	else if (p->flag & _F_SPACE)
 		return ;
 }
 
-int		get_unbr_space(t_print *p, uintmax_t n, int pads)
+int			get_unbr_space(t_print *p, uintmax_t n, int pads)
 {
 	int space;
 	int len;
 
 	len = get_nbr_len(n);
 	space = 0;
-//	if (p->width > 0)
-//		(n < 0 || p->flag & _F_PLUS || p->flag & _F_SPACE) && p->width--;
 	if (p->flag & _F_PCN)
 	{
 		if (pads)

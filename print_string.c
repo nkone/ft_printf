@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/23 19:53:11 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/23 20:25:42 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/06/03 14:40:53 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ char	*get_str_argv(t_print *p)
 
 	tmp = p->argv;
 	va_copy(ap, p->ap);
-	while (tmp-- > 0)
+	while (tmp--)
 		s = va_arg(ap, char *);
 	va_end(ap);
 	return (s);

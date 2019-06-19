@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/22 18:52:04 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/28 20:22:08 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/06/03 13:03:33 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,10 @@
 # define _S_J		(1U << 6U)
 # define _S_T		(1U << 7U)
 
-# define _VALID_TYPES "cs%diuroxXpf"
+# define _VALID_TYPES "cs%diuboxXpf"
 # define LOWER_BASE "0123456789abcdef"
 # define UPPER_BASE "0123456789ABCDEF"
+# define D_FPREC	6
 
 typedef struct		s_print
 {
@@ -49,6 +50,28 @@ typedef struct		s_print
 	va_list			ap;
 }					t_print;
 
+typedef struct		s_float
+{
+	uint64_t		whole;
+	uint64_t		frac;
+	uint32_t		space;
+	uint32_t		pads;
+	uint32_t		pcn;
+	int8_t			sign;
+	long double		rem;
+	long double		diff;
+}					t_float;
+
+/*
+** ft_printf.c
+*/
+
+int					collect_argv(t_print *p);
+int					collector_driver(t_print *p);
+int					ft_printf_con(t_print *p);
+int					ft_printf_(const char *str, va_list ap);
+int					ft_printf(const char *str, ...);
+
 /*
 ** print_collector.c
 */
@@ -59,14 +82,31 @@ int					collect_width(t_print *p);
 int					collect_pcn(t_print *p);
 int					collect_type(t_print *p);
 
+/*
+** print_char_driver.c
+*/
+
+void				print_char_(t_print *p, char c);
+int					get_char_argv(t_print *p);
 void				print_char(t_print *p);
 void				print_mod(t_print *p);
+
+/*
+** print_main_1.c
+*/
+
 void				print_nbr(t_print *p);
 void				print_unbr(t_print *p);
 void				print_unbr_base2(t_print *p);
 void				print_unbr_base8(t_print *p);
 void				print_unbr_base16(t_print *p);
+
+/*
+** print_main_2.c
+*/
+
 void				print_void_pointer(t_print *p);
+void				print_float(t_print *p);
 
 /*
 ** print_string.c
@@ -91,7 +131,8 @@ static	t_jump *g_print_table[] =
 	print_unbr_base8,
 	print_unbr_base16,
 	print_unbr_base16,
-	print_void_pointer
+	print_void_pointer,
+	print_float
 };
 
 /*
@@ -264,5 +305,33 @@ void				print_base16_case1(t_print *p, uintmax_t n);
 void				print_base16_case2(t_print *p, uintmax_t n, int sp);
 void				print_base16_case3(t_print *p, uintmax_t n, int pd);
 void				print_base16_case4(t_print *p, uintmax_t n, int sp, int pd);
-void				print_base16_driver(t_print *p, uintmax_t n, int sp, int pd);
+void				print_base16_driver(t_print *p, uintmax_t n, int s, int d);
+
+/*
+** print_pointer_driver.c
+*/
+
+void				print_vp_case1(t_print *p, uintmax_t n);
+void				print_vp_case2(t_print *p, uintmax_t n, int sp);
+void				print_vp_case3(t_print *p, uintmax_t n, int pd);
+void				print_vp_case4(t_print *p, uintmax_t n, int sp, int pd);
+void				print_vp_driver(t_print *p, uintmax_t n, int sp, int pd);
+
+/*
+** print_float_driver.c
+*/
+
+void				init_float(t_float *f);
+void				print_float_driver(t_print *p, t_float f);
+void				print_float_(t_print *p, t_float f);
+void				print_float_rounding(long double n, t_float *f);
+
+/*
+** print_float_util.c
+*/
+
+long double			get_float(t_print *p, va_list ap);
+long double			get_float_arg(t_print *p);
+uintmax_t			pow10(int8_t n);
+
 #endif

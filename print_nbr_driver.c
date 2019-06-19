@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/22 18:18:44 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/29 16:40:10 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/06/03 11:30:22 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	print_nbr_case4(t_print *p, intmax_t n, int space, int pads)
 	(!(p->flag & _F_MINUS)) && put_nchar(' ', space);
 	process_sp_plus_flag(p, n);
 	put_nchar('0', pads);
-	print_nbr_prototype(p,n);
+	print_nbr_prototype(p, n);
 	(p->flag & _F_MINUS) && put_nchar(' ', space);
 }
 

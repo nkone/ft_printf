@@ -6,13 +6,13 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/24 14:53:25 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/24 14:54:00 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/06/03 11:34:25 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	collect_flag(t_print *p) 
+int	collect_flag(t_print *p)
 {
 	if (*p->str == '-')
 		return (p->flag |= _F_MINUS);
@@ -23,7 +23,7 @@ int	collect_flag(t_print *p)
 	if (*p->str == '0')
 		return (p->flag |= _F_ZERO);
 	if (*p->str == '#')
-		return (p->flag |= _F_HASH);	
+		return (p->flag |= _F_HASH);
 	return (0);
 }
 
@@ -49,7 +49,7 @@ int	collect_size(t_print *p)
 		return (p->size |= _S_T);
 	return (0);
 }
-	
+
 int	collect_width(t_print *p)
 {
 	if (ft_isdigit(*p->str))
@@ -95,7 +95,7 @@ int	collect_type(t_print *p)
 		return (0);
 	if (!(ref = ft_strchr(_VALID_TYPES, *p->str)))
 		return (0);
-	else 
+	else
 		return (p->type = (ptrdiff_t)(ref - _VALID_TYPES) + 1);
 	return (0);
 }

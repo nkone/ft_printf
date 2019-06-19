@@ -1,25 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
+/*   ft_isdigit.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/20 12:05:37 by phtruong          #+#    #+#             */
-/*   Updated: 2019/06/03 11:43:28 by phtruong         ###   ########.fr       */
+/*   Created: 2019/02/16 09:42:24 by phtruong          #+#    #+#             */
+/*   Updated: 2019/02/16 11:08:10 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
 ** DESCRIPTION
-** Outputs the char c to the file descriptor fd.
+** Checks if character is digit.
+** RETURN VALUES
+** 1 for true, 0 for false.
 */
 
 #include "libft.h"
 
-ssize_t	ft_putstr_fd(char const *s, int fd)
+int	ft_isdigit(int c)
 {
-	if (!s)
-		return (-1);
-	return (write(fd, s, ft_strlen(s)));
+	return (c >= '0' && c <= '9');
 }

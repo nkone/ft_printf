@@ -6,7 +6,7 @@
 #    By: phtruong <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/05 21:46:13 by phtruong          #+#    #+#              #
-#    Updated: 2019/05/28 16:17:12 by phtruong         ###   ########.fr        #
+#    Updated: 2019/06/03 11:19:19 by phtruong         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 DEFAULT:=\033[39m
@@ -34,7 +34,11 @@ CFLAGS := -Werror -Wall -Wextra
 src :=	ft_putstr.c ft_putstr_fd.c ft_strlen.c ft_putchar.c ft_putchar_fd.c ft_strchr.c \
 		ft_isdigit.c ft_atoi.c ft_isspace.c ft_strcspn.c ft_printf_util.c print_nbr_driver.c \
 		print_nbr_util_1.c print_nbr_util_2.c print_nbr_size_1.c print_nbr_size_2.c \
-		print_unbr_size_1.c print_unbr_size_2.c print_unbr_util_1.c print_unbr_util_2.c print_unbr_util_3.c print_unbr_driver.c print_binary_driver.c print_octal_driver.c print_hex_driver.c print_string.c print_collector.c main.c
+		print_unbr_size_1.c print_unbr_size_2.c print_unbr_util_1.c print_unbr_util_2.c \
+		print_unbr_util_3.c print_float_util.c print_unbr_driver.c print_binary_driver.c \
+		print_octal_driver.c print_hex_driver.c print_pointer_driver.c print_float_driver.c \
+		print_char_driver.c print_string.c print_collector.c print_main_1.c print_main_2.c ft_printf.c \
+
 no_files := $(words ${src})
 obj := ${src:.c=.o}
 HEADER := NO

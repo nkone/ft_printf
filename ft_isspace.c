@@ -1,25 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
+/*   ft_isspace.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/20 12:05:37 by phtruong          #+#    #+#             */
-/*   Updated: 2019/06/03 11:43:28 by phtruong         ###   ########.fr       */
+/*   Created: 2019/02/16 09:34:18 by phtruong          #+#    #+#             */
+/*   Updated: 2019/02/16 15:23:11 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
 ** DESCRIPTION
-** Outputs the char c to the file descriptor fd.
+** Check for spaces
+** RETURN VALUES
+** 1 for true, 0 for false
 */
 
 #include "libft.h"
 
-ssize_t	ft_putstr_fd(char const *s, int fd)
+int	ft_isspace(int c)
 {
-	if (!s)
-		return (-1);
-	return (write(fd, s, ft_strlen(s)));
+	return (c == 32 || (c >= 9 && c <= 13));
 }

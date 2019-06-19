@@ -6,13 +6,13 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/11 17:54:58 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/22 16:36:08 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/06/03 11:44:03 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-void			reset_print(t_print *p)
+void	reset_print(t_print *p)
 {
 	p->argv = 0;
 	p->flag = 0;
@@ -24,7 +24,7 @@ void			reset_print(t_print *p)
 	p->str = NULL;
 }
 
-void			reset_collector(t_print *p)
+void	reset_collector(t_print *p)
 {
 	p->argv = 0;
 	p->flag = 0;
@@ -34,7 +34,7 @@ void			reset_collector(t_print *p)
 	p->width = 0;
 }
 
-int 			put_nchar(char c, int n)
+int		put_nchar(char c, int n)
 {
 	if (n <= 0)
 		return (0);
@@ -43,7 +43,7 @@ int 			put_nchar(char c, int n)
 	return (1);
 }
 
-int				get_nspace(t_print *p,	int len)
+int		get_nspace(t_print *p, int len)
 {
 	int space;
 

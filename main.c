@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/24 13:41:48 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/29 16:45:19 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/06/03 14:44:30 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,321 +120,11 @@
 // Create a function pointers to handle width✓;
 // Collect size✓;
 // Putnumber✓;
-// Find p->done for nbr w/ pcn;
-
-int	collect_argv(t_print *p)
-{
-	const char	*s;
-
-	s = p->str;
-	while (ft_isdigit(*s))
-		s++;
-	if (*s != '$')
-		return (0);
-	else
-		p->argv = ft_atoi(p->str);
-	while (ft_isdigit(*p->str))
-		p->str++;
-	return (1);
-}
-
-int	collector_driver(t_print *p)
-{
-	(collect_argv(p)) && p->str++;
-	while (collect_flag(p))
-		p->str++;
-	(collect_width(p)) && p->str++;
-	(collect_pcn(p)) && p->str++;
-	(collect_size(p)) && p->str++;
-	(collect_type(p)) && p->str++;
-	//printf("\nargv: %d flag: %d width: %d pcn: %d size: %d type: %d \n", p->argv, p->flag, p->width, p->pcn, p->size, p->type);
-	if (!p->type)
-		return (0);
-	return (1);
-}
-
-void	print_char_(t_print *p, char c)
-{
-	char	d;
-
-	d = (p->flag & _F_ZERO && !(p->flag & _F_MINUS)) ? '0' : ' ';
-	if (!(p->flag & _F_MINUS))
-		put_nchar(d, p->width-1);
-	ft_putchar(c);
-	if (p->flag & _F_MINUS)
-		put_nchar(d, p->width-1);
-}
-
-int		get_char_argv(t_print *p)
-{
-	va_list		ap;
-	int			tmp;
-	int			c;
-
-	tmp = p->argv;
-	va_copy(ap, p->ap);
-	while (tmp-- > 0)
-		c = va_arg(ap, int);
-	va_end(ap);
-	return (c);
-}
-
-void	print_char(t_print *p)
-{
-	char		c;
-
-	c = (p->argv) ? get_char_argv(p) : va_arg(p->ap, long int);
-	p->done += (p->width) ? (p->width) : 1;
-	if ((p->done) >= INT_MAX)
-		return;
-	print_char_(p, c);
-}
+// Find p->done for nbr w/ pcn✓;
+// make struct for float printing✓;
+// pad zeroes according to precision✓;
 
 
-void	print_mod(t_print *p)
-{
-	p->done += (p->width) ? (p->width) : 1;
-	print_char_(p, '%');
-}
-
-void print_nbr(t_print *p)
-{
-	intmax_t n;
-	int len;
-	int space;
-	int pads;
-	
-	n = (p->argv) ? print_nbr_getsize_arg(p) : print_nbr_getsize(p);
-	len = (n < 0) ? get_nbr_len(-n) : get_nbr_len(n);
-	(!n && !p->pcn && p->flag & _F_PCN) && (len = 0);
-	pads = (p->pcn > len) ? (p->pcn - len) : 0;
-	space = get_nbr_space(p, n, pads);
-	p->done += (space + pads + len);
-	if (p->done >= INT_MAX)
-		return ;
-	if (n < 0)
-		p->done++;
-	else if (n >= 0 && (p->flag & _F_PLUS || p->flag & _F_SPACE))
-		p->done++;
-	print_nbr_driver(p, n, space, pads);
-}
-
-void	print_unbr(t_print *p)
-{
-	uintmax_t n;
-	int len;
-	int space;
-	int pads;
-	
-	n = (p->argv) ? print_unbr_getsize_arg(p) : print_unbr_getsize(p);
-	len = get_nbr_len(n);
-	(!n && !p->pcn && p->flag & _F_PCN) && (len = 0);
-	pads = (p->pcn > len) ? (p->pcn - len) : 0;
-	space = get_unbr_space(p, n, pads);
-	p->done += (space + pads);
-	if (p->done >= INT_MAX)
-		return ;
-	p->done += len;
-	print_unbr_driver(p, n, space, pads);
-}
-
-void	print_binary(uintmax_t n)
-{
-	if (n >= 2)
-	{
-		print_binary(n/2);
-		(n & 1) ? ft_putchar('1') : ft_putchar('0');
-	}
-	else
-		(n & 1) ? ft_putchar('1') : ft_putchar('0');
-}
-
-void	print_unbr_base2(t_print *p)
-{
-	uintmax_t n;
-	int len;
-	int space;
-	int pads;
-
-	n = (p->argv) ? print_unbr_getsize_arg(p) : print_unbr_getsize(p);
-	len = get_unbr_len_base(n, 2);
-	(!n && !p->pcn && p->flag & _F_PCN) && (len = 0);
-	pads = (p->pcn > len) ? (p->pcn - len) : 0;
-	space = get_unbr_sp_base(p, n, pads, 2);
-	//printf("space: %d len: %d ", space, len);
-	p->done += (space + pads);
-	if (p->done >= INT_MAX)
-		return ;
-	p->done += len;
-	print_base2_driver(p, n, space, pads);
-}
-
-void	print_unbr_base8(t_print *p)
-{
-	uintmax_t n;
-	int len;
-	int space;
-	int pads;
-
-	n = (p->argv) ? print_unbr_getsize_arg(p) : print_unbr_getsize(p);
-	len = get_unbr_len_base(n, 8);
-	(!n && !p->pcn && p->flag & _F_PCN) && (len = 0);
-	//(p->flag & _F_HASH && n) && p->done++;
-	pads = (p->pcn > len) ? (p->pcn - len) : 0;
-	space = get_unbr_sp_base(p, n, pads, 8);
-//	printf("space: %d pads: %d ", space, pads);
-	if (!n && p->flag & _F_PCN && p->flag & _F_HASH && !p->pcn && space)
-		space--;
-	(n && p->flag & _F_HASH && space && !pads) && space--;
-	p->done += (space + pads);
-	if (p->done >= INT_MAX)
-		return ;
-	p->done += len;
-	print_base8_driver(p, n, space, pads);
-}
-
-void	print_unbr_base16(t_print *p)
-{
-	uintmax_t n;
-	int len;
-	int space;
-	int pads;
-
-	n = (p->argv) ? print_unbr_getsize_arg(p) : print_unbr_getsize(p);
-	len = get_unbr_len_base(n, 16);
-	(!n && !p->pcn && p->flag & _F_PCN) && (len = 0);
-	pads = (p->pcn > len) ? (p->pcn - len) : 0;
-	space = get_unbr_sp_base(p, n, pads, 16);
-//	printf("space: %d pads: %d ", space, pads);
-	(p->flag & _F_HASH && n) && (space -= 2);
-	(space < 0) && (space = 0);
-	p->done += (space + pads);
-	if (p->done >= INT_MAX)
-		return ;
-	p->done += len;
-	print_base16_driver(p, n, space, pads);
-}
-
-void	print_vp_case1(t_print *p, uintmax_t n)
-{
-	p->done += ft_putstr("0x");
-	(!n && !p->pcn && p->flag & _F_PCN) ? 0 :print_unbr_base_lo(n, 16);
-}
-
-void	print_vp_case2(t_print *p, uintmax_t n, int space)
-{
-	char c;
-
-	c = (p->flag & _F_ZERO && !(p->flag & _F_MINUS || p->flag & _F_PCN)) ?
-		'0' : ' ';
-	(c == ' ' && !(p->flag & _F_MINUS)) && put_nchar(c , space);
-	p->done += ft_putstr("0x");
-	(c == '0') && put_nchar(c, space);
-	(!n && !p->pcn && p->flag & _F_PCN) ? 0 :print_unbr_base_lo(n, 16);
-	(c == ' ' && (p->flag & _F_MINUS)) && put_nchar(c, space);
-}
-
-void	print_vp_case3(t_print *p, uintmax_t n, int pads)
-{
-	p->done += ft_putstr("0x");
-	put_nchar('0', pads);
-	(!n && !p->pcn && p->flag & _F_PCN) ? 0 :print_unbr_base_lo(n, 16);
-}
-
-void	print_vp_case4(t_print *p, uintmax_t n, int space, int pads)
-{
-	!(p->flag & _F_MINUS) && put_nchar(' ', space);
-	p->done += ft_putstr("0x");
-	put_nchar('0', pads);
-	(!n && !p->pcn && p->flag & _F_PCN) ? 0 :print_unbr_base_lo(n, 16);
-	(p->flag & _F_MINUS) && put_nchar(' ', space);
-}
-void print_vp_driver(t_print *p, uintmax_t n, int space, int pads) 
-{
-	if (!space && !pads)
-		print_vp_case1(p, n);
-	else if (space && !pads)
-		print_vp_case2(p, n, space);
-	else if (!space && pads)
-		print_vp_case3(p, n, pads);
-	else if (space && pads)
-		print_vp_case4(p, n, space, pads);
-}
-void	print_void_pointer(t_print *p)
-{
-	uintmax_t n;
-	int len;
-	int space;
-	int pads;
-
-	n = (uintmax_t)va_arg(p->ap, void *);
-	len = get_unbr_len_base(n, 16);
-	(!n && p->flag & _F_PCN && !p->pcn) && (len = 0);
-	pads = (p->pcn > len) ? (p->pcn - len) : 0;
-	space = get_unbr_sp_base(p, n, pads, 16) - 2;
-	(space < 0) && (space = 0);
-	p->done += (space + pads);
-	if (p->done >= INT_MAX)
-		return ;
-	p->done += len;
-	print_vp_driver(p, n, space, pads);
-}
-
-
-int	ft_printf_con(t_print *p)
-{
-	if (*p->str == '%')
-	{
-		p->str++;
-		if (!*p->str)
-			return (0);
-		if (!collector_driver(p))
-			return (0);
-		g_print_table[p->type - 1](p);
-		if (p->done > INT_MAX)
-			return (-1);
-	}
-	else
-	{
-		if (p->done == INT_MAX)
-			return (-1);
-		p->done++;
-		ft_putchar(*p->str++);
-	}
-	return (1);
-}
-
-int	ft_printf_(const char *str, va_list ap)
-{
-	t_print p;
-	int check;
-
-	reset_print(&p);
-	va_copy(p.ap, ap);
-	p.str = str;
-	while (*p.str)
-	{
-		reset_collector(&p);
-		if (!(check = ft_printf_con(&p)))
-			return (p.done);
-		else if (check == -1)
-			return (-1);
-	}	
-	va_end (p.ap);
-	return (p.done);
-}
-
-int	ft_printf(const char *str, ...)
-{
-	va_list ap;
-	int done;
-
-	va_start (ap, str);
-	done = ft_printf_(str, ap);
-	va_end(ap);
-	return (done);
-}
-/*
 int main(void)
 {
 //	printf("-------------------------------------STRINGS---------------------------------------\n");
@@ -1363,248 +1053,281 @@ int main(void)
 //	printf("ft_printf: %d vs %d :printf #123\n", ft_printf("|%#013.13x|\t", u), printf("|%#013.13x|\t", u));
 //	printf("ft_printf: %d vs %d :printf #124\n", ft_printf("|%#04.4x|\t", u), printf("|%#04.4x|\t", u));
 
-	printf("-------------------------------------POINTERS-------------------------------------\n");//let's deal with precision today
-	int p_int_1_pos = 1;
-	int p_int_1_neg = -1;
-	int p_int_0_pos = 0;
-	int p_int_intmax = INT_MAX;
-	int p_int_intmin = INT_MIN;
-	int p_int_10_pos = 10;
-	int p_int_10_neg = -10;
-	int p_int8_max = INT8_MAX;
-	int p_int8_min = INT8_MIN;
-	int p_int16_max = INT16_MAX;
-	int p_int16_min = INT16_MIN;
-	int p_int32_max = INT32_MAX;
-	int p_int32_min = INT32_MIN;
-	long int p_int64_max = INT64_MAX;
-	long int p_int64_min = INT64_MIN;
-	uint8_t p_uint8 = UINT8_MAX;
-	uint16_t p_uint16 = UINT16_MAX;
-	uint32_t p_uint32 = UINT32_MAX;
-	uint64_t p_uint64 = UINT64_MAX;
+//	printf("-------------------------------------POINTERS-------------------------------------\n");//let's deal with precision today
+//	int p_int_1_pos = 1;
+//	int p_int_1_neg = -1;
+//	int p_int_0_pos = 0;
+//	int p_int_intmax = INT_MAX;
+//	int p_int_intmin = INT_MIN;
+//	int p_int_10_pos = 10;
+//	int p_int_10_neg = -10;
+//	int p_int8_max = INT8_MAX;
+//	int p_int8_min = INT8_MIN;
+//	int p_int16_max = INT16_MAX;
+//	int p_int16_min = INT16_MIN;
+//	int p_int32_max = INT32_MAX;
+//	int p_int32_min = INT32_MIN;
+//	long int p_int64_max = INT64_MAX;
+//	long int p_int64_min = INT64_MIN;
+//	uint8_t p_uint8 = UINT8_MAX;
+//	uint16_t p_uint16 = UINT16_MAX;
+//	uint32_t p_uint32 = UINT32_MAX;
+//	uint64_t p_uint64 = UINT64_MAX;
+//	printf("INT = %d\n", p_int_0_pos);
+//	// basic width
+//	printf("basic width\n");
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("|%p|\t", p_int_0_pos), printf("|%p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("|%1p|\t", p_int_0_pos), printf("|%1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("|%2p|\t", p_int_0_pos), printf("|%2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("|%3p|\t", p_int_0_pos), printf("|%3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #5\n", ft_printf("|%4p|\t", p_int_0_pos), printf("|%4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #6\n", ft_printf("|%5p|\t", p_int_0_pos), printf("|%5p|\t", p_int_0_pos));
+//	// basic minus flag
+//	puts("basic minus");
+//	printf("ft_printf: %d vs %d :printf #7\n", ft_printf("|%-1p|\t", p_int_0_pos), printf("|%-1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #8\n", ft_printf("|%-2p|\t", p_int_0_pos), printf("|%-2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #9\n", ft_printf("|%-3p|\t", p_int_0_pos), printf("|%-3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #10\n", ft_printf("|%-4p|\t", p_int_0_pos), printf("|%-4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #11\n", ft_printf("|%-5p|\t", p_int_0_pos), printf("|%-5p|\t", p_int_0_pos));
+//	// basic zero flag
+//	puts("basic zero");
+//	printf("ft_printf: %d vs %d :printf #12\n", ft_printf("|%01p|\t", p_int_0_pos), printf("|%01p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #13\n", ft_printf("|%02p|\t", p_int_0_pos), printf("|%02p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #14\n", ft_printf("|%03p|\t", p_int_0_pos), printf("|%03p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #15\n", ft_printf("|%04p|\t", p_int_0_pos), printf("|%04p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #16\n", ft_printf("|%05p|\t", p_int_0_pos), printf("|%05p|\t", p_int_0_pos));
+//	// basic minus zero flag
+//	puts("basic minus zero");
+//	printf("ft_printf: %d vs %d :printf #17\n", ft_printf("|%-01p|\t", p_int_0_pos), printf("|%-01p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #18\n", ft_printf("|%-02p|\t", p_int_0_pos), printf("|%-02p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #19\n", ft_printf("|%-03p|\t", p_int_0_pos), printf("|%-03p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #20\n", ft_printf("|%-04p|\t", p_int_0_pos), printf("|%-04p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #21\n", ft_printf("|%-05p|\t", p_int_0_pos), printf("|%-05p|\t", p_int_0_pos));
+//	// basic precision
+//	puts("basic precision");
+//	printf("ft_printf: %d vs %d :printf #22\n", ft_printf("|%.p|\t", p_int_0_pos), printf("|%.p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #23\n", ft_printf("|%.1p|\t", p_int_0_pos), printf("|%.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #24\n", ft_printf("|%.2p|\t", p_int_0_pos), printf("|%.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #25\n", ft_printf("|%.3p|\t", p_int_0_pos), printf("|%.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #26\n", ft_printf("|%.4p|\t", p_int_0_pos), printf("|%.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #27\n", ft_printf("|%.5p|\t", p_int_0_pos), printf("|%.5p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #28\n", ft_printf("|%.p|\t", p_int_0_pos), printf("|%.p|\t", p_int_0_pos));
+//	// width = precision
+//	puts("width = precision");
+//	printf("ft_printf: %d vs %d :printf #29\n", ft_printf("|%1.1p|\t", p_int_0_pos), printf("|%1.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #30\n", ft_printf("|%2.2p|\t", p_int_0_pos), printf("|%2.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #31\n", ft_printf("|%3.3p|\t", p_int_0_pos), printf("|%3.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #32\n", ft_printf("|%4.4p|\t", p_int_0_pos), printf("|%4.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #33\n", ft_printf("|%5.5p|\t", p_int_0_pos), printf("|%5.5p|\t", p_int_0_pos));
+//	// width < precision (by 1)
+//	puts("width < precision (by 1)");
+//	printf("ft_printf: %d vs %d :printf #34\n", ft_printf("|%1.2p|\t", p_int_0_pos), printf("|%1.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #35\n", ft_printf("|%2.3p|\t", p_int_0_pos), printf("|%2.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #36\n", ft_printf("|%3.4p|\t", p_int_0_pos), printf("|%3.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #37\n", ft_printf("|%4.5p|\t", p_int_0_pos), printf("|%4.5p|\t", p_int_0_pos));
+//	// width < precision (by 2)
+//	puts("width < precision (by 2)");
+//	printf("ft_printf: %d vs %d :printf #38\n", ft_printf("|%1.3p|\t", p_int_0_pos), printf("|%1.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #39\n", ft_printf("|%2.4p|\t", p_int_0_pos), printf("|%2.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #40\n", ft_printf("|%3.5p|\t", p_int_0_pos), printf("|%3.5p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #41\n", ft_printf("|%4.6p|\t", p_int_0_pos), printf("|%4.6p|\t", p_int_0_pos));
+//	// width < precision (by 5)
+//	puts("width < precision (by 5)");
+//	printf("ft_printf: %d vs %d :printf #42\n", ft_printf("|%1.6p|\t", p_int_0_pos), printf("|%1.6p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #43\n", ft_printf("|%2.7p|\t", p_int_0_pos), printf("|%2.7p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #44\n", ft_printf("|%3.8p|\t", p_int_0_pos), printf("|%3.8p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #45\n", ft_printf("|%4.9p|\t", p_int_0_pos), printf("|%4.9p|\t", p_int_0_pos));
+//	// width > precision (by 1)
+//	puts("width > precision (by 1)");
+//	printf("ft_printf: %d vs %d :printf #46\n", ft_printf("|%2.1p|\t", p_int_0_pos), printf("|%2.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #47\n", ft_printf("|%3.2p|\t", p_int_0_pos), printf("|%3.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #48\n", ft_printf("|%4.3p|\t", p_int_0_pos), printf("|%4.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #49\n", ft_printf("|%5.4p|\t", p_int_0_pos), printf("|%5.4p|\t", p_int_0_pos));
+//	// width > precision (by 2)
+//	puts("width > precision (by 2)");
+//	printf("ft_printf: %d vs %d :printf #50\n", ft_printf("|%3.1p|\t", p_int_0_pos), printf("|%3.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #51\n", ft_printf("|%4.2p|\t", p_int_0_pos), printf("|%4.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #52\n", ft_printf("|%5.3p|\t", p_int_0_pos), printf("|%5.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #53\n", ft_printf("|%6.4p|\t", p_int_0_pos), printf("|%6.4p|\t", p_int_0_pos));
+//	// width > precision (by 5)
+//	puts("width > precision (by 5)");
+//	printf("ft_printf: %d vs %d :printf #54\n", ft_printf("|%6.1p|\t", p_int_0_pos), printf("|%6.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #55\n", ft_printf("|%7.2p|\t", p_int_0_pos), printf("|%7.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #56\n", ft_printf("|%8.3p|\t", p_int_0_pos), printf("|%8.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #57\n", ft_printf("|%9.4p|\t", p_int_0_pos), printf("|%9.4p|\t", p_int_0_pos));
+//	// minus flag width = precision
+//	puts("minus flag width = precision");
+//	printf("ft_printf: %d vs %d :printf #58\n", ft_printf("|%-1.1p|\t", p_int_0_pos), printf("|%-1.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #59\n", ft_printf("|%-2.2p|\t", p_int_0_pos), printf("|%-2.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #60\n", ft_printf("|%-3.3p|\t", p_int_0_pos), printf("|%-3.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #61\n", ft_printf("|%-4.4p|\t", p_int_0_pos), printf("|%-4.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #62\n", ft_printf("|%-5.5p|\t", p_int_0_pos), printf("|%-5.5p|\t", p_int_0_pos));
+//	// minus flag width < precision (by 1)
+//	puts("minus flag width < precision (by 1)");
+//	printf("ft_printf: %d vs %d :printf #63\n", ft_printf("|%-1.2p|\t", p_int_0_pos), printf("|%-1.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #64\n", ft_printf("|%-2.3p|\t", p_int_0_pos), printf("|%-2.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #65\n", ft_printf("|%-3.4p|\t", p_int_0_pos), printf("|%-3.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #66\n", ft_printf("|%-4.5p|\t", p_int_0_pos), printf("|%-4.5p|\t", p_int_0_pos));
+//	// minus flag width < precision (by 2)
+//	puts("minus flag width < precision (by 2)");
+//	printf("ft_printf: %d vs %d :printf #67\n", ft_printf("|%-1.3p|\t", p_int_0_pos), printf("|%-1.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #68\n", ft_printf("|%-2.4p|\t", p_int_0_pos), printf("|%-2.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #69\n", ft_printf("|%-3.5p|\t", p_int_0_pos), printf("|%-3.5p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #70\n", ft_printf("|%-4.6p|\t", p_int_0_pos), printf("|%-4.6p|\t", p_int_0_pos));
+//	// minus flag width < precision (by 5)
+//	puts("minus flag width < precision (by 5)");
+//	printf("ft_printf: %d vs %d :printf #71\n", ft_printf("|%-1.6p|\t", p_int_0_pos), printf("|%-1.6p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #72\n", ft_printf("|%-2.7p|\t", p_int_0_pos), printf("|%-2.7p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #73\n", ft_printf("|%-3.8p|\t", p_int_0_pos), printf("|%-3.8p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #74\n", ft_printf("|%-4.9p|\t", p_int_0_pos), printf("|%-4.9p|\t", p_int_0_pos));
+//	// minus flag width > precision (by 1)
+//	puts("minus flag width > precision (by 1)");
+//	printf("ft_printf: %d vs %d :printf #75\n", ft_printf("|%-2.1p|\t", p_int_0_pos), printf("|%-2.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #76\n", ft_printf("|%-3.2p|\t", p_int_0_pos), printf("|%-3.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #77\n", ft_printf("|%-4.3p|\t", p_int_0_pos), printf("|%-4.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #78\n", ft_printf("|%-5.4p|\t", p_int_0_pos), printf("|%-5.4p|\t", p_int_0_pos));
+//	// minus flag width > precision (by 2)
+//	puts("minus flag width > precision (by 2)");
+//	printf("ft_printf: %d vs %d :printf #79\n", ft_printf("|%-3.1p|\t", p_int_0_pos), printf("|%-3.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #80\n", ft_printf("|%-4.2p|\t", p_int_0_pos), printf("|%-4.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #81\n", ft_printf("|%-5.3p|\t", p_int_0_pos), printf("|%-5.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #82\n", ft_printf("|%-6.4p|\t", p_int_0_pos), printf("|%-6.4p|\t", p_int_0_pos));
+//	// minus flag width > precision (by 5)
+//	puts("minus flag width > precision (by 5)");
+//	printf("ft_printf: %d vs %d :printf #83\n", ft_printf("|%-6.1p|\t", p_int_0_pos), printf("|%-6.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #84\n", ft_printf("|%-7.2p|\t", p_int_0_pos), printf("|%-7.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #85\n", ft_printf("|%-8.3p|\t", p_int_0_pos), printf("|%-8.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #86\n", ft_printf("|%-9.4p|\t", p_int_0_pos), printf("|%-9.4p|\t", p_int_0_pos));
+//	// zero flag width = precision
+//	puts("zero flag width = precision");
+//	printf("ft_printf: %d vs %d :printf #87\n", ft_printf("|%01.1p|\t", p_int_0_pos), printf("|%01.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #88\n", ft_printf("|%02.2p|\t", p_int_0_pos), printf("|%02.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #89\n", ft_printf("|%03.3p|\t", p_int_0_pos), printf("|%03.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #90\n", ft_printf("|%04.4p|\t", p_int_0_pos), printf("|%04.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #91\n", ft_printf("|%05.5p|\t", p_int_0_pos), printf("|%05.5p|\t", p_int_0_pos));
+//	// zero flag width < precision (by 1)
+//	puts("zero flag width < precision (by 1)");
+//	printf("ft_printf: %d vs %d :printf #92\n", ft_printf("|%01.2p|\t", p_int_0_pos), printf("|%01.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #93\n", ft_printf("|%02.3p|\t", p_int_0_pos), printf("|%02.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #94\n", ft_printf("|%03.4p|\t", p_int_0_pos), printf("|%03.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #95\n", ft_printf("|%04.5p|\t", p_int_0_pos), printf("|%04.5p|\t", p_int_0_pos));
+//	// zero flag width < precision (by 2)
+//	puts("zero flag width < precision (by 2)");
+//	printf("ft_printf: %d vs %d :printf #96\n", ft_printf("|%01.3p|\t", p_int_0_pos), printf("|%01.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #97\n", ft_printf("|%02.4p|\t", p_int_0_pos), printf("|%02.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #98\n", ft_printf("|%03.5p|\t", p_int_0_pos), printf("|%03.5p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #99\n", ft_printf("|%04.6p|\t", p_int_0_pos), printf("|%04.6p|\t", p_int_0_pos));
+//	// zero flag width < precision (by 5)
+//	puts("zero flag width < precision (by 5)");
+//	printf("ft_printf: %d vs %d :printf #100\n", ft_printf("|%01.6p|\t", p_int_0_pos), printf("|%01.6p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #101\n", ft_printf("|%02.7p|\t", p_int_0_pos), printf("|%02.7p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #102\n", ft_printf("|%03.8p|\t", p_int_0_pos), printf("|%03.8p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #103\n", ft_printf("|%04.9p|\t", p_int_0_pos), printf("|%04.9p|\t", p_int_0_pos));
+//	// zero flag width > precision (by 1)
+//	puts("zero flag width > precision (by 1)");
+//	printf("ft_printf: %d vs %d :printf #104\n", ft_printf("|%02.1p|\t", p_int_0_pos), printf("|%02.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #105\n", ft_printf("|%03.2p|\t", p_int_0_pos), printf("|%03.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #106\n", ft_printf("|%04.3p|\t", p_int_0_pos), printf("|%04.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #107\n", ft_printf("|%05.4p|\t", p_int_0_pos), printf("|%05.4p|\t", p_int_0_pos));
+//	// zero flag width > precision (by 2)
+//	puts("zero flag width > precision (by 2)");
+//	printf("ft_printf: %d vs %d :printf #108\n", ft_printf("|%03.1p|\t", p_int_0_pos), printf("|%03.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #109\n", ft_printf("|%04.2p|\t", p_int_0_pos), printf("|%04.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #110\n", ft_printf("|%05.3p|\t", p_int_0_pos), printf("|%05.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #111\n", ft_printf("|%06.4p|\t", p_int_0_pos), printf("|%06.4p|\t", p_int_0_pos));
+//	// zero flag width > precision (by 5)
+//	puts("zero flag width > precision (by 5)");
+//	printf("ft_printf: %d vs %d :printf #112\n", ft_printf("|%06.1p|\t", p_int_0_pos), printf("|%06.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #113\n", ft_printf("|%07.2p|\t", p_int_0_pos), printf("|%07.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #114\n", ft_printf("|%08.3p|\t", p_int_0_pos), printf("|%08.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #115\n", ft_printf("|%09.4p|\t", p_int_0_pos), printf("|%09.4p|\t", p_int_0_pos));
+//	// minus zero flag width = precision
+//	puts("minus zero flag width = precision");
+//	printf("ft_printf: %d vs %d :printf #116\n", ft_printf("|%-01.1p|\t", p_int_0_pos), printf("|%-01.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #117\n", ft_printf("|%-02.2p|\t", p_int_0_pos), printf("|%-02.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #118\n", ft_printf("|%-03.3p|\t", p_int_0_pos), printf("|%-03.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #119\n", ft_printf("|%-04.4p|\t", p_int_0_pos), printf("|%-04.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #120\n", ft_printf("|%-05.5p|\t", p_int_0_pos), printf("|%-05.5p|\t", p_int_0_pos));
+//	// minus zero flag width < precision (by 1)
+//	puts("minus zero flag width < precision (by 1)");
+//	printf("ft_printf: %d vs %d :printf #121\n", ft_printf("|%-01.2p|\t", p_int_0_pos), printf("|%-01.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #122\n", ft_printf("|%-02.3p|\t", p_int_0_pos), printf("|%-02.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #123\n", ft_printf("|%-03.4p|\t", p_int_0_pos), printf("|%-03.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #124\n", ft_printf("|%-04.5p|\t", p_int_0_pos), printf("|%-04.5p|\t", p_int_0_pos));
+//	// minus zero flag width < precision (by 2)
+//	puts("minus zero flag width < precision (by 2)");
+//	printf("ft_printf: %d vs %d :printf #125\n", ft_printf("|%-01.3p|\t", p_int_0_pos), printf("|%-01.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #126\n", ft_printf("|%-02.4p|\t", p_int_0_pos), printf("|%-02.4p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #127\n", ft_printf("|%-03.5p|\t", p_int_0_pos), printf("|%-03.5p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #128\n", ft_printf("|%-04.6p|\t", p_int_0_pos), printf("|%-04.6p|\t", p_int_0_pos));
+//	// minus zero flag width < precision (by 5)
+//	puts("minus zero flag width < precision (by 5)");
+//	printf("ft_printf: %d vs %d :printf #129\n", ft_printf("|%-01.6p|\t", p_int_0_pos), printf("|%-01.6p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #130\n", ft_printf("|%-02.7p|\t", p_int_0_pos), printf("|%-02.7p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #131\n", ft_printf("|%-03.8p|\t", p_int_0_pos), printf("|%-03.8p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #132\n", ft_printf("|%-04.9p|\t", p_int_0_pos), printf("|%-04.9p|\t", p_int_0_pos));
+//	// minus zero flag width > precision (by 1)
+//	puts("minus zero flag width > precision (by 1)");
+//	printf("ft_printf: %d vs %d :printf #133\n", ft_printf("|%-02.1p|\t", p_int_0_pos), printf("|%-02.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #134\n", ft_printf("|%-03.2p|\t", p_int_0_pos), printf("|%-03.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #135\n", ft_printf("|%-04.3p|\t", p_int_0_pos), printf("|%-04.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #136\n", ft_printf("|%-05.4p|\t", p_int_0_pos), printf("|%-05.4p|\t", p_int_0_pos));
+//	// minus zero flag width > precision (by 2)
+//	puts("minus zero flag width > precision (by 2)");
+//	printf("ft_printf: %d vs %d :printf #137\n", ft_printf("|%-03.1p|\t", p_int_0_pos), printf("|%-03.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #138\n", ft_printf("|%-04.2p|\t", p_int_0_pos), printf("|%-04.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #139\n", ft_printf("|%-05.3p|\t", p_int_0_pos), printf("|%-05.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #140\n", ft_printf("|%-06.4p|\t", p_int_0_pos), printf("|%-06.4p|\t", p_int_0_pos));
+//	// minus zero flag width > precision (by 5)
+//	puts("minus zero flag width > precision (by 5)");
+//	printf("ft_printf: %d vs %d :printf #141\n", ft_printf("|%-06.1p|\t", p_int_0_pos), printf("|%-06.1p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #142\n", ft_printf("|%-07.2p|\t", p_int_0_pos), printf("|%-07.2p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #143\n", ft_printf("|%-08.3p|\t", p_int_0_pos), printf("|%-08.3p|\t", p_int_0_pos));
+//	printf("ft_printf: %d vs %d :printf #144\n", ft_printf("|%-09.4p|\t", p_int_0_pos), printf("|%-09.4p|\t", p_int_0_pos));
 
-	printf("INT = %d\n", p_int_0_pos);
-	// basic width
-	printf("basic width\n");
-	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("|%p|\t", p_int_0_pos), printf("|%p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("|%1p|\t", p_int_0_pos), printf("|%1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("|%2p|\t", p_int_0_pos), printf("|%2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("|%3p|\t", p_int_0_pos), printf("|%3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #5\n", ft_printf("|%4p|\t", p_int_0_pos), printf("|%4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #6\n", ft_printf("|%5p|\t", p_int_0_pos), printf("|%5p|\t", p_int_0_pos));
-	// basic minus flag
-	puts("basic minus");
-	printf("ft_printf: %d vs %d :printf #7\n", ft_printf("|%-1p|\t", p_int_0_pos), printf("|%-1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #8\n", ft_printf("|%-2p|\t", p_int_0_pos), printf("|%-2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #9\n", ft_printf("|%-3p|\t", p_int_0_pos), printf("|%-3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #10\n", ft_printf("|%-4p|\t", p_int_0_pos), printf("|%-4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #11\n", ft_printf("|%-5p|\t", p_int_0_pos), printf("|%-5p|\t", p_int_0_pos));
-	// basic zero flag
-	puts("basic zero");
-	printf("ft_printf: %d vs %d :printf #12\n", ft_printf("|%01p|\t", p_int_0_pos), printf("|%01p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #13\n", ft_printf("|%02p|\t", p_int_0_pos), printf("|%02p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #14\n", ft_printf("|%03p|\t", p_int_0_pos), printf("|%03p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #15\n", ft_printf("|%04p|\t", p_int_0_pos), printf("|%04p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #16\n", ft_printf("|%05p|\t", p_int_0_pos), printf("|%05p|\t", p_int_0_pos));
-	// basic minus zero flag
-	puts("basic minus zero");
-	printf("ft_printf: %d vs %d :printf #17\n", ft_printf("|%-01p|\t", p_int_0_pos), printf("|%-01p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #18\n", ft_printf("|%-02p|\t", p_int_0_pos), printf("|%-02p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #19\n", ft_printf("|%-03p|\t", p_int_0_pos), printf("|%-03p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #20\n", ft_printf("|%-04p|\t", p_int_0_pos), printf("|%-04p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #21\n", ft_printf("|%-05p|\t", p_int_0_pos), printf("|%-05p|\t", p_int_0_pos));
-	// basic precision
-	puts("basic precision");
-	printf("ft_printf: %d vs %d :printf #22\n", ft_printf("|%.p|\t", p_int_0_pos), printf("|%.p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #23\n", ft_printf("|%.1p|\t", p_int_0_pos), printf("|%.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #24\n", ft_printf("|%.2p|\t", p_int_0_pos), printf("|%.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #25\n", ft_printf("|%.3p|\t", p_int_0_pos), printf("|%.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #26\n", ft_printf("|%.4p|\t", p_int_0_pos), printf("|%.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #27\n", ft_printf("|%.5p|\t", p_int_0_pos), printf("|%.5p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #28\n", ft_printf("|%.p|\t", p_int_0_pos), printf("|%.p|\t", p_int_0_pos));
-	// width = precision
-	puts("width = precision");
-	printf("ft_printf: %d vs %d :printf #29\n", ft_printf("|%1.1p|\t", p_int_0_pos), printf("|%1.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #30\n", ft_printf("|%2.2p|\t", p_int_0_pos), printf("|%2.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #31\n", ft_printf("|%3.3p|\t", p_int_0_pos), printf("|%3.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #32\n", ft_printf("|%4.4p|\t", p_int_0_pos), printf("|%4.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #33\n", ft_printf("|%5.5p|\t", p_int_0_pos), printf("|%5.5p|\t", p_int_0_pos));
-	// width < precision (by 1)
-	puts("width < precision (by 1)");
-	printf("ft_printf: %d vs %d :printf #34\n", ft_printf("|%1.2p|\t", p_int_0_pos), printf("|%1.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #35\n", ft_printf("|%2.3p|\t", p_int_0_pos), printf("|%2.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #36\n", ft_printf("|%3.4p|\t", p_int_0_pos), printf("|%3.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #37\n", ft_printf("|%4.5p|\t", p_int_0_pos), printf("|%4.5p|\t", p_int_0_pos));
-	// width < precision (by 2)
-	puts("width < precision (by 2)");
-	printf("ft_printf: %d vs %d :printf #38\n", ft_printf("|%1.3p|\t", p_int_0_pos), printf("|%1.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #39\n", ft_printf("|%2.4p|\t", p_int_0_pos), printf("|%2.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #40\n", ft_printf("|%3.5p|\t", p_int_0_pos), printf("|%3.5p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #41\n", ft_printf("|%4.6p|\t", p_int_0_pos), printf("|%4.6p|\t", p_int_0_pos));
-	// width < precision (by 5)
-	puts("width < precision (by 5)");
-	printf("ft_printf: %d vs %d :printf #42\n", ft_printf("|%1.6p|\t", p_int_0_pos), printf("|%1.6p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #43\n", ft_printf("|%2.7p|\t", p_int_0_pos), printf("|%2.7p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #44\n", ft_printf("|%3.8p|\t", p_int_0_pos), printf("|%3.8p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #45\n", ft_printf("|%4.9p|\t", p_int_0_pos), printf("|%4.9p|\t", p_int_0_pos));
-	// width > precision (by 1)
-	puts("width > precision (by 1)");
-	printf("ft_printf: %d vs %d :printf #46\n", ft_printf("|%2.1p|\t", p_int_0_pos), printf("|%2.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #47\n", ft_printf("|%3.2p|\t", p_int_0_pos), printf("|%3.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #48\n", ft_printf("|%4.3p|\t", p_int_0_pos), printf("|%4.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #49\n", ft_printf("|%5.4p|\t", p_int_0_pos), printf("|%5.4p|\t", p_int_0_pos));
-	// width > precision (by 2)
-	puts("width > precision (by 2)");
-	printf("ft_printf: %d vs %d :printf #50\n", ft_printf("|%3.1p|\t", p_int_0_pos), printf("|%3.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #51\n", ft_printf("|%4.2p|\t", p_int_0_pos), printf("|%4.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #52\n", ft_printf("|%5.3p|\t", p_int_0_pos), printf("|%5.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #53\n", ft_printf("|%6.4p|\t", p_int_0_pos), printf("|%6.4p|\t", p_int_0_pos));
-	// width > precision (by 5)
-	puts("width > precision (by 5)");
-	printf("ft_printf: %d vs %d :printf #54\n", ft_printf("|%6.1p|\t", p_int_0_pos), printf("|%6.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #55\n", ft_printf("|%7.2p|\t", p_int_0_pos), printf("|%7.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #56\n", ft_printf("|%8.3p|\t", p_int_0_pos), printf("|%8.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #57\n", ft_printf("|%9.4p|\t", p_int_0_pos), printf("|%9.4p|\t", p_int_0_pos));
-	// minus flag width = precision
-	puts("minus flag width = precision");
-	printf("ft_printf: %d vs %d :printf #58\n", ft_printf("|%-1.1p|\t", p_int_0_pos), printf("|%-1.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #59\n", ft_printf("|%-2.2p|\t", p_int_0_pos), printf("|%-2.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #60\n", ft_printf("|%-3.3p|\t", p_int_0_pos), printf("|%-3.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #61\n", ft_printf("|%-4.4p|\t", p_int_0_pos), printf("|%-4.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #62\n", ft_printf("|%-5.5p|\t", p_int_0_pos), printf("|%-5.5p|\t", p_int_0_pos));
-	// minus flag width < precision (by 1)
-	puts("minus flag width < precision (by 1)");
-	printf("ft_printf: %d vs %d :printf #63\n", ft_printf("|%-1.2p|\t", p_int_0_pos), printf("|%-1.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #64\n", ft_printf("|%-2.3p|\t", p_int_0_pos), printf("|%-2.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #65\n", ft_printf("|%-3.4p|\t", p_int_0_pos), printf("|%-3.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #66\n", ft_printf("|%-4.5p|\t", p_int_0_pos), printf("|%-4.5p|\t", p_int_0_pos));
-	// minus flag width < precision (by 2)
-	puts("minus flag width < precision (by 2)");
-	printf("ft_printf: %d vs %d :printf #67\n", ft_printf("|%-1.3p|\t", p_int_0_pos), printf("|%-1.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #68\n", ft_printf("|%-2.4p|\t", p_int_0_pos), printf("|%-2.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #69\n", ft_printf("|%-3.5p|\t", p_int_0_pos), printf("|%-3.5p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #70\n", ft_printf("|%-4.6p|\t", p_int_0_pos), printf("|%-4.6p|\t", p_int_0_pos));
-	// minus flag width < precision (by 5)
-	puts("minus flag width < precision (by 5)");
-	printf("ft_printf: %d vs %d :printf #71\n", ft_printf("|%-1.6p|\t", p_int_0_pos), printf("|%-1.6p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #72\n", ft_printf("|%-2.7p|\t", p_int_0_pos), printf("|%-2.7p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #73\n", ft_printf("|%-3.8p|\t", p_int_0_pos), printf("|%-3.8p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #74\n", ft_printf("|%-4.9p|\t", p_int_0_pos), printf("|%-4.9p|\t", p_int_0_pos));
-	// minus flag width > precision (by 1)
-	puts("minus flag width > precision (by 1)");
-	printf("ft_printf: %d vs %d :printf #75\n", ft_printf("|%-2.1p|\t", p_int_0_pos), printf("|%-2.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #76\n", ft_printf("|%-3.2p|\t", p_int_0_pos), printf("|%-3.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #77\n", ft_printf("|%-4.3p|\t", p_int_0_pos), printf("|%-4.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #78\n", ft_printf("|%-5.4p|\t", p_int_0_pos), printf("|%-5.4p|\t", p_int_0_pos));
-	// minus flag width > precision (by 2)
-	puts("minus flag width > precision (by 2)");
-	printf("ft_printf: %d vs %d :printf #79\n", ft_printf("|%-3.1p|\t", p_int_0_pos), printf("|%-3.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #80\n", ft_printf("|%-4.2p|\t", p_int_0_pos), printf("|%-4.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #81\n", ft_printf("|%-5.3p|\t", p_int_0_pos), printf("|%-5.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #82\n", ft_printf("|%-6.4p|\t", p_int_0_pos), printf("|%-6.4p|\t", p_int_0_pos));
-	// minus flag width > precision (by 5)
-	puts("minus flag width > precision (by 5)");
-	printf("ft_printf: %d vs %d :printf #83\n", ft_printf("|%-6.1p|\t", p_int_0_pos), printf("|%-6.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #84\n", ft_printf("|%-7.2p|\t", p_int_0_pos), printf("|%-7.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #85\n", ft_printf("|%-8.3p|\t", p_int_0_pos), printf("|%-8.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #86\n", ft_printf("|%-9.4p|\t", p_int_0_pos), printf("|%-9.4p|\t", p_int_0_pos));
-	// zero flag width = precision
-	puts("zero flag width = precision");
-	printf("ft_printf: %d vs %d :printf #87\n", ft_printf("|%01.1p|\t", p_int_0_pos), printf("|%01.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #88\n", ft_printf("|%02.2p|\t", p_int_0_pos), printf("|%02.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #89\n", ft_printf("|%03.3p|\t", p_int_0_pos), printf("|%03.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #90\n", ft_printf("|%04.4p|\t", p_int_0_pos), printf("|%04.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #91\n", ft_printf("|%05.5p|\t", p_int_0_pos), printf("|%05.5p|\t", p_int_0_pos));
-	// zero flag width < precision (by 1)
-	puts("zero flag width < precision (by 1)");
-	printf("ft_printf: %d vs %d :printf #92\n", ft_printf("|%01.2p|\t", p_int_0_pos), printf("|%01.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #93\n", ft_printf("|%02.3p|\t", p_int_0_pos), printf("|%02.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #94\n", ft_printf("|%03.4p|\t", p_int_0_pos), printf("|%03.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #95\n", ft_printf("|%04.5p|\t", p_int_0_pos), printf("|%04.5p|\t", p_int_0_pos));
-	// zero flag width < precision (by 2)
-	puts("zero flag width < precision (by 2)");
-	printf("ft_printf: %d vs %d :printf #96\n", ft_printf("|%01.3p|\t", p_int_0_pos), printf("|%01.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #97\n", ft_printf("|%02.4p|\t", p_int_0_pos), printf("|%02.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #98\n", ft_printf("|%03.5p|\t", p_int_0_pos), printf("|%03.5p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #99\n", ft_printf("|%04.6p|\t", p_int_0_pos), printf("|%04.6p|\t", p_int_0_pos));
-	// zero flag width < precision (by 5)
-	puts("zero flag width < precision (by 5)");
-	printf("ft_printf: %d vs %d :printf #100\n", ft_printf("|%01.6p|\t", p_int_0_pos), printf("|%01.6p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #101\n", ft_printf("|%02.7p|\t", p_int_0_pos), printf("|%02.7p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #102\n", ft_printf("|%03.8p|\t", p_int_0_pos), printf("|%03.8p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #103\n", ft_printf("|%04.9p|\t", p_int_0_pos), printf("|%04.9p|\t", p_int_0_pos));
-	// zero flag width > precision (by 1)
-	puts("zero flag width > precision (by 1)");
-	printf("ft_printf: %d vs %d :printf #104\n", ft_printf("|%02.1p|\t", p_int_0_pos), printf("|%02.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #105\n", ft_printf("|%03.2p|\t", p_int_0_pos), printf("|%03.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #106\n", ft_printf("|%04.3p|\t", p_int_0_pos), printf("|%04.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #107\n", ft_printf("|%05.4p|\t", p_int_0_pos), printf("|%05.4p|\t", p_int_0_pos));
-	// zero flag width > precision (by 2)
-	puts("zero flag width > precision (by 2)");
-	printf("ft_printf: %d vs %d :printf #108\n", ft_printf("|%03.1p|\t", p_int_0_pos), printf("|%03.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #109\n", ft_printf("|%04.2p|\t", p_int_0_pos), printf("|%04.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #110\n", ft_printf("|%05.3p|\t", p_int_0_pos), printf("|%05.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #111\n", ft_printf("|%06.4p|\t", p_int_0_pos), printf("|%06.4p|\t", p_int_0_pos));
-	// zero flag width > precision (by 5)
-	puts("zero flag width > precision (by 5)");
-	printf("ft_printf: %d vs %d :printf #112\n", ft_printf("|%06.1p|\t", p_int_0_pos), printf("|%06.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #113\n", ft_printf("|%07.2p|\t", p_int_0_pos), printf("|%07.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #114\n", ft_printf("|%08.3p|\t", p_int_0_pos), printf("|%08.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #115\n", ft_printf("|%09.4p|\t", p_int_0_pos), printf("|%09.4p|\t", p_int_0_pos));
-	// minus zero flag width = precision
-	puts("minus zero flag width = precision");
-	printf("ft_printf: %d vs %d :printf #116\n", ft_printf("|%-01.1p|\t", p_int_0_pos), printf("|%-01.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #117\n", ft_printf("|%-02.2p|\t", p_int_0_pos), printf("|%-02.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #118\n", ft_printf("|%-03.3p|\t", p_int_0_pos), printf("|%-03.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #119\n", ft_printf("|%-04.4p|\t", p_int_0_pos), printf("|%-04.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #120\n", ft_printf("|%-05.5p|\t", p_int_0_pos), printf("|%-05.5p|\t", p_int_0_pos));
-	// minus zero flag width < precision (by 1)
-	puts("minus zero flag width < precision (by 1)");
-	printf("ft_printf: %d vs %d :printf #121\n", ft_printf("|%-01.2p|\t", p_int_0_pos), printf("|%-01.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #122\n", ft_printf("|%-02.3p|\t", p_int_0_pos), printf("|%-02.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #123\n", ft_printf("|%-03.4p|\t", p_int_0_pos), printf("|%-03.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #124\n", ft_printf("|%-04.5p|\t", p_int_0_pos), printf("|%-04.5p|\t", p_int_0_pos));
-	// minus zero flag width < precision (by 2)
-	puts("minus zero flag width < precision (by 2)");
-	printf("ft_printf: %d vs %d :printf #125\n", ft_printf("|%-01.3p|\t", p_int_0_pos), printf("|%-01.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #126\n", ft_printf("|%-02.4p|\t", p_int_0_pos), printf("|%-02.4p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #127\n", ft_printf("|%-03.5p|\t", p_int_0_pos), printf("|%-03.5p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #128\n", ft_printf("|%-04.6p|\t", p_int_0_pos), printf("|%-04.6p|\t", p_int_0_pos));
-	// minus zero flag width < precision (by 5)
-	puts("minus zero flag width < precision (by 5)");
-	printf("ft_printf: %d vs %d :printf #129\n", ft_printf("|%-01.6p|\t", p_int_0_pos), printf("|%-01.6p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #130\n", ft_printf("|%-02.7p|\t", p_int_0_pos), printf("|%-02.7p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #131\n", ft_printf("|%-03.8p|\t", p_int_0_pos), printf("|%-03.8p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #132\n", ft_printf("|%-04.9p|\t", p_int_0_pos), printf("|%-04.9p|\t", p_int_0_pos));
-	// minus zero flag width > precision (by 1)
-	puts("minus zero flag width > precision (by 1)");
-	printf("ft_printf: %d vs %d :printf #133\n", ft_printf("|%-02.1p|\t", p_int_0_pos), printf("|%-02.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #134\n", ft_printf("|%-03.2p|\t", p_int_0_pos), printf("|%-03.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #135\n", ft_printf("|%-04.3p|\t", p_int_0_pos), printf("|%-04.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #136\n", ft_printf("|%-05.4p|\t", p_int_0_pos), printf("|%-05.4p|\t", p_int_0_pos));
-	// minus zero flag width > precision (by 2)
-	puts("minus zero flag width > precision (by 2)");
-	printf("ft_printf: %d vs %d :printf #137\n", ft_printf("|%-03.1p|\t", p_int_0_pos), printf("|%-03.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #138\n", ft_printf("|%-04.2p|\t", p_int_0_pos), printf("|%-04.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #139\n", ft_printf("|%-05.3p|\t", p_int_0_pos), printf("|%-05.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #140\n", ft_printf("|%-06.4p|\t", p_int_0_pos), printf("|%-06.4p|\t", p_int_0_pos));
-	// minus zero flag width > precision (by 5)
-	puts("minus zero flag width > precision (by 5)");
-	printf("ft_printf: %d vs %d :printf #141\n", ft_printf("|%-06.1p|\t", p_int_0_pos), printf("|%-06.1p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #142\n", ft_printf("|%-07.2p|\t", p_int_0_pos), printf("|%-07.2p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #143\n", ft_printf("|%-08.3p|\t", p_int_0_pos), printf("|%-08.3p|\t", p_int_0_pos));
-	printf("ft_printf: %d vs %d :printf #144\n", ft_printf("|%-09.4p|\t", p_int_0_pos), printf("|%-09.4p|\t", p_int_0_pos));
+//	printf("-------------------------------------FLOATS--------------------------------------\n");
+//	double f_pos = 9873.000001;
+//	double f_neg = -1.5;
+//	ft_printf("%f\n", f_pos);
+//	printf("@main_ftprintf: |%###-#0000 33...12..#0+0d|", 256);
+
 //	printf("-------------------------------------SIZE_RELATED---------------------------------\n");
 //	size_t t= UINT_MAX;
+//	// size_t
 //	printf("ft_printf: %d vs %d :printf #1\n",ft_printf("|%zd|\t", t),		printf("|%zd|\t", t));
+//	printf("ft_printf: %d vs %d :printf #2\n",ft_printf("|%20zd|\t", t),		printf("|%20zd|\t", t));
+//	printf("ft_printf: %d vs %d :printf #3\n",ft_printf("|%.18zd|\t", t),		printf("|%.18zd|\t", t));
+//	printf("ft_printf: %d vs %d :printf #4\n",ft_printf("|%19.20zd|\t", t),		printf("|%19.20zd|\t", t));
+//	printf("ft_printf: %d vs %d :printf #5\n",ft_printf("|%+zd|\t", t),		printf("|%+zd|\t", t));
+//	printf("ft_printf: %d vs %d :printf #6\n",ft_printf("|% zd|\t", t),		printf("|% zd|\t", t));
+//	// int_max;
+//	intmax_t n = INTMAX_MAX;
+//	printf("ft_printf: %d vs %d :printf #1\n",ft_printf("|%35jd|\t", n),		printf("|%35jd|\t", n));
+//	printf("ft_printf: %d vs %d :printf #2\n",ft_printf("|%035jd|\t", n),		printf("|%035jd|\t", n));
+//	printf("ft_printf: %d vs %d :printf #3\n",ft_printf("|%.20jd|\t", n),		printf("|%.20jd|\t", n));
+//	printf("ft_printf: %d vs %d :printf #4\n",ft_printf("|%035.20jd|\t", n),		printf("|%035.20jd|\t", n));
+//	printf("ft_printf: %d vs %d :printf #5\n",ft_printf("|%jd|\t", n),		printf("|%jd|\t", n));
+//	printf("ft_printf: %d vs %d :printf #6\n",ft_printf("|%.jd|\t", n),		printf("|%.jd|\t", n));
+//	// ptrdiff_t
+//	ptrdiff_t d = PTRDIFF_MIN;
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("|%21td|\t", d),		printf("|%21td|\t", d));
+//	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("|%021td|\t", d),		printf("|%021td|\t", d));
+//	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("|%.td|\t", d),		printf("|%.td|\t", d));
+//	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("|%21.20td|\t", d),		printf("|%21.20td|\t", d));
 
 //	printf("------------------------------------ARG_BONUS-----------------------------------\n");
 //	printf("NUMBER RELATED\n");
+//	// int
 //	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%3$d, %2$d, %1$d \t", 1, 2, 3), printf("%3$d, %2$d, %1$d \t", 1, 2, 3));
 //	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("%2$d, %3$d, %1$d \t", 1, 2, 3), printf("%2$d, %3$d, %1$d \t", 1, 2, 3));
 //	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("%1$d, %3$d, %2$d \t", 1, 2, 3), printf("%1$d, %3$d, %2$d \t", 1, 2, 3));
 //	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("%3$d, %2$d, %2$d \t", 1, 2, 3), printf("%3$d, %2$d, %2$d \t", 1, 2, 3));
+	// float
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%3$f, %2$f, %1$f \t", 1.0, 2.0, 3.0), printf("%3$f, %2$f, %1$f \t", 1.0, 2.0, 3.0));
+//	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("%2$f, %3$f, %1$f \t", 1.0, 2.0, 3.0), printf("%2$f, %3$f, %1$f \t", 1.0, 2.0, 3.0));
+//	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("%1$f, %3$f, %2$f \t", 1.0, 2.0, 3.0), printf("%1$f, %3$f, %2$f \t", 1.0, 2.0, 3.0));
+//	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("%3$f, %2$f, %2$f \t", 1.0, 2.0, 3.0), printf("%3$f, %2$f, %2$f \t", 1.0, 2.0, 3.0));
+//	// strings
 //	printf("STRING RELATED\n");
 //	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%3$s, %2$s, %1$s \t", "hi", "low", "hello"), printf("%3$s, %2$s, %1$s \t", "hi", "low", "hello"));
 //	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("%2$s, %3$s, %1$s \t", "hi", "low", "hello"), printf("%2$s, %3$s, %1$s \t", "hi", "low", "hello"));
@@ -1616,9 +1339,16 @@ int main(void)
 //	printf("ft_printf: %d vs %d :printf #8\n", ft_printf("%3$s, %3$s, %3$s \t", "hi", "low", "hello"), printf("%3$s, %3$s, %3$s \t", "hi", "low", "hello"));
 //	printf("ft_printf: %d vs %d :printf #9\n", ft_printf("%2$s, %2$s, %1$s \t", "hi", "low", "hello"), printf("%2$s, %2$s, %1$s \t", "hi", "low", "hello"));
 //	printf("ft_printf: %d vs %d :printf #10\n", ft_printf("%2$s, %2$s, %3$s \t", "hi", "low", "hello"), printf("%2$s, %2$s, %3$s \t", "hi", "low", "hello"));
-
+//	// int mix string
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%3$d, %2$s, %1$d \t", 1, "hi", 3), printf("%3$d, %2$s, %1$d \t", 1, "hi", 3));
+	// float mix string (doesn't work lol)
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%2$s %1$f\t", 1.0, "hi"), printf("%2$s %1$f\t",1.0, "hi"));
+	// float int mix (doesn't work lol)
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%1$d %2$f\t", 1, 2.0), printf("%1$d %2$f\t", 1, 2.0));
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("%2$f %1$d\t", 1, 2.0), printf("%2$f %1$d\t", 1, 2.0));
 //	printf("------------------------------------STAR_BONUS------------------------------------\n");
-//	int width = -5;
+//	int width = 10;
+//	int prec = 5;
 //	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("|%*d| \t", width, 123), printf("|%*d| \t", width, 123));
 //	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("|%+*d| \t", width, 123), printf("|%+*d| \t", width, 123));
 //	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("|%-*d| \t", width, 123), printf("|%-*d| \t", width, 123));
@@ -1626,64 +1356,77 @@ int main(void)
 //	printf("ft_printf: %d vs %d :printf #5\n", ft_printf("|%0*d| \t", width, 123), printf("|%0*d| \t", width, 123));
 //	printf("ft_printf: %d vs %d :printf #6\n", ft_printf("|%+0*d| \t", width, 123), printf("|%+0*d| \t", width, 123));
 //	printf("ft_printf: %d vs %d :printf #7\n", ft_printf("|%+-0*d| \t", width, 123), printf("|%+-0*d| \t", width, 123));
+//	// string
+//	char *s = NULL;
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("|%*.*s| \t", width, prec, s), printf("|%*.*s| \t", width, prec, s));
+//	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("|%0*.*s| \t", width, prec, s), printf("|%0*.*s| \t", width, prec, s));
+//	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("|%-*.*s| \t", width, prec, s), printf("|%-*.*s| \t", width, prec, s));
+//	// float
+//	double f = 123.003456;
+//	printf("ft_printf: %d vs %d :printf #1\n", ft_printf("|%*.*f| \t", width, prec, f), printf("|%*.*f| \t", width, prec, f));
+//	printf("ft_printf: %d vs %d :printf #2\n", ft_printf("|%0*.*f| \t", width, prec, f), printf("|%0*.*f| \t", width, prec, f));
+//	printf("ft_printf: %d vs %d :printf #3\n", ft_printf("|%-*.*f| \t", width, prec, f), printf("|%-*.*f| \t", width, prec, f));
+//	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("|%+*.*f| \t", width, prec, f), printf("|%+*.*f| \t", width, prec, f));
+//	printf("ft_printf: %d vs %d :printf #4\n", ft_printf("|% *.*f| \t", width, prec, f), printf("|% *.*f| \t", width, prec, f));
+
 
 //	printf("-------------------------------------BINARY----------------------------------------\n");
 //	uint8_t u = 3;
-//	printf("returns: %d #1\n", ft_printf("|%r|\t", u));
-//	printf("returns: %d #2\n", ft_printf("|%1r|\t", u));
-//	printf("returns: %d #3\n", ft_printf("|%2r|\t", u));
-//	printf("returns: %d #4\n", ft_printf("|%3r|\t", u));
-//	printf("returns: %d #5\n", ft_printf("|%4r|\t", u));
-//	printf("returns: %d #6\n", ft_printf("|%5r|\t", u));
-//	printf("returns: %d #7\n", ft_printf("|%6r|\t", u));
-//	printf("returns: %d #8\n", ft_printf("|%7r|\t", u));
-//	printf("returns: %d #9\n", ft_printf("|%-1r|\t", u));
-//	printf("returns: %d #10\n", ft_printf("|%-2r|\t", u));
-//	printf("returns: %d #11\n", ft_printf("|%-3r|\t", u));
-//	printf("returns: %d #12\n", ft_printf("|%-4r|\t", u));
-//	printf("returns: %d #13\n", ft_printf("|%-5r|\t", u));
-//	printf("returns: %d #14\n", ft_printf("|%-6r|\t", u));
-//	printf("returns: %d #15\n", ft_printf("|%-7r|\t", u));
-//	printf("returns: %d #16\n", ft_printf("|%.1r|\t", u));
-//	printf("returns: %d #17\n", ft_printf("|%.2r|\t", u));
-//	printf("returns: %d #18\n", ft_printf("|%.3r|\t", u));
-//	printf("returns: %d #19\n", ft_printf("|%.4r|\t", u));
-//	printf("returns: %d #20\n", ft_printf("|%.5r|\t", u));
-//	printf("returns: %d #21\n", ft_printf("|%.6r|\t", u));
-//	printf("returns: %d #22\n", ft_printf("|%3.1r|\t", u));
-//	printf("returns: %d #23\n", ft_printf("|%3.2r|\t", u));
-//	printf("returns: %d #24\n", ft_printf("|%3.3r|\t", u));
-//	printf("returns: %d #25\n", ft_printf("|%3.4r|\t", u));
-//	printf("returns: %d #26\n", ft_printf("|%3.5r|\t", u));
-//	printf("returns: %d #27\n", ft_printf("|%3.6r|\t", u));
-//	printf("returns: %d #28\n", ft_printf("|%4.3r|\t", u));
-//	printf("returns: %d #29\n", ft_printf("|%5.3r|\t", u));
-//	printf("returns: %d #30\n", ft_printf("|%6.3r|\t", u));
-//	printf("returns: %d #31\n", ft_printf("|%-3.2r|\t", u));
-//	printf("returns: %d #32\n", ft_printf("|%-4.2r|\t", u));
-//	printf("returns: %d #33\n", ft_printf("|%-5.2r|\t", u));
-//	printf("returns: %d #34\n", ft_printf("|%-6.2r|\t", u));
-//	printf("returns: %d #35\n", ft_printf("|%-7.2r|\t", u));
-//	printf("returns: %d #36\n", ft_printf("|%-8.2r|\t", u));
-//	printf("returns: %d #37\n", ft_printf("|%-3.3r|\t", u));
-//	printf("returns: %d #38\n", ft_printf("|%-5.4r|\t", u));
-//	printf("returns: %d #39\n", ft_printf("|%-7.5r|\t", u));
-//	printf("returns: %d #40\n", ft_printf("|%-9.6r|\t", u));
-//	printf("returns: %d #41\n", ft_printf("|%-11.7r|\t", u));
-//	printf("returns: %d #42\n", ft_printf("|%-13.8r|\t", u));
-//	printf("returns: %d #43\n", ft_printf("|%-.6r|\t", u));
-//	printf("returns: %d #44\n", ft_printf("|%1.6r|\t", u));
-//	printf("returns: %d #45\n", ft_printf("|%2.6r|\t", u));
-//	printf("returns: %d #46\n", ft_printf("|%3.6r|\t", u));
-//	printf("returns: %d #47\n", ft_printf("|%4.6r|\t", u));
-//	printf("returns: %d #48\n", ft_printf("|%5.6r|\t", u));
-//	printf("returns: %d #49\n", ft_printf("|%6.6r|\t", u));
-//	printf("returns: %d #50\n", ft_printf("|%7.6r|\t", u));
-//	printf("returns: %d #51\n", ft_printf("|%8.6r|\t", u));
-//	printf("returns: %d #52\n", ft_printf("|%9.6r|\t", u));
-//	printf("returns: %d #53\n", ft_printf("|%10.6r|\t", u));
-//	printf("returns: %d #54\n", ft_printf("|%11.6r|\t", u));
-//	printf("returns: %d #55\n", ft_printf("|%12.6r|\t", u));
+//	printf("returns: %d #1\n", ft_printf("|%b|\t", u));
+//	printf("returns: %d #2\n", ft_printf("|%1b|\t", u));
+//	printf("returns: %d #3\n", ft_printf("|%2b|\t", u));
+//	printf("returns: %d #4\n", ft_printf("|%3b|\t", u));
+//	printf("returns: %d #5\n", ft_printf("|%4b|\t", u));
+//	printf("returns: %d #6\n", ft_printf("|%5b|\t", u));
+//	printf("returns: %d #7\n", ft_printf("|%6b|\t", u));
+//	printf("returns: %d #8\n", ft_printf("|%7b|\t", u));
+//	printf("returns: %d #9\n", ft_printf("|%-1b|\t", u));
+//	printf("returns: %d #10\n", ft_printf("|%-2b|\t", u));
+//	printf("returns: %d #11\n", ft_printf("|%-3b|\t", u));
+//	printf("returns: %d #12\n", ft_printf("|%-4b|\t", u));
+//	printf("returns: %d #13\n", ft_printf("|%-5b|\t", u));
+//	printf("returns: %d #14\n", ft_printf("|%-6b|\t", u));
+//	printf("returns: %d #15\n", ft_printf("|%-7b|\t", u));
+//	printf("returns: %d #16\n", ft_printf("|%.1b|\t", u));
+//	printf("returns: %d #17\n", ft_printf("|%.2b|\t", u));
+//	printf("returns: %d #18\n", ft_printf("|%.3b|\t", u));
+//	printf("returns: %d #19\n", ft_printf("|%.4b|\t", u));
+//	printf("returns: %d #20\n", ft_printf("|%.5b|\t", u));
+//	printf("returns: %d #21\n", ft_printf("|%.6b|\t", u));
+//	printf("returns: %d #22\n", ft_printf("|%3.1b|\t", u));
+//	printf("returns: %d #23\n", ft_printf("|%3.2b|\t", u));
+//	printf("returns: %d #24\n", ft_printf("|%3.3b|\t", u));
+//	printf("returns: %d #25\n", ft_printf("|%3.4b|\t", u));
+//	printf("returns: %d #26\n", ft_printf("|%3.5b|\t", u));
+//	printf("returns: %d #27\n", ft_printf("|%3.6b|\t", u));
+//	printf("returns: %d #28\n", ft_printf("|%4.3b|\t", u));
+//	printf("returns: %d #29\n", ft_printf("|%5.3b|\t", u));
+//	printf("returns: %d #30\n", ft_printf("|%6.3b|\t", u));
+//	printf("returns: %d #31\n", ft_printf("|%-3.2b|\t", u));
+//	printf("returns: %d #32\n", ft_printf("|%-4.2b|\t", u));
+//	printf("returns: %d #33\n", ft_printf("|%-5.2b|\t", u));
+//	printf("returns: %d #34\n", ft_printf("|%-6.2b|\t", u));
+//	printf("returns: %d #35\n", ft_printf("|%-7.2b|\t", u));
+//	printf("returns: %d #36\n", ft_printf("|%-8.2b|\t", u));
+//	printf("returns: %d #37\n", ft_printf("|%-3.3b|\t", u));
+//	printf("returns: %d #38\n", ft_printf("|%-5.4b|\t", u));
+//	printf("returns: %d #39\n", ft_printf("|%-7.5b|\t", u));
+//	printf("returns: %d #40\n", ft_printf("|%-9.6b|\t", u));
+//	printf("returns: %d #41\n", ft_printf("|%-11.7b|\t", u));
+//	printf("returns: %d #42\n", ft_printf("|%-13.8b|\t", u));
+//	printf("returns: %d #43\n", ft_printf("|%-.6b|\t", u));
+//	printf("returns: %d #44\n", ft_printf("|%1.6b|\t", u));
+//	printf("returns: %d #45\n", ft_printf("|%2.6b|\t", u));
+//	printf("returns: %d #46\n", ft_printf("|%3.6b|\t", u));
+//	printf("returns: %d #47\n", ft_printf("|%4.6b|\t", u));
+//	printf("returns: %d #48\n", ft_printf("|%5.6b|\t", u));
+//	printf("returns: %d #49\n", ft_printf("|%6.6b|\t", u));
+//	printf("returns: %d #50\n", ft_printf("|%7.6b|\t", u));
+//	printf("returns: %d #51\n", ft_printf("|%8.6b|\t", u));
+//	printf("returns: %d #52\n", ft_printf("|%9.6b|\t", u));
+//	printf("returns: %d #53\n", ft_printf("|%10.6b|\t", u));
+//	printf("returns: %d #54\n", ft_printf("|%11.6b|\t", u));
+//	printf("returns: %d #55\n", ft_printf("|%12.6b|\t", u));
 	//while(1);	
 	return (0);
-}*/
+}

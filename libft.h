@@ -6,7 +6,7 @@
 /*   By: phtruong <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/12 14:40:25 by phtruong          #+#    #+#             */
-/*   Updated: 2019/05/20 14:42:13 by phtruong         ###   ########.fr       */
+/*   Updated: 2019/06/03 11:45:11 by phtruong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ char				*ft_itoa(int n);
 ** Stdio lib
 */
 
-ssize_t					ft_putchar(char c);
+ssize_t				ft_putchar(char c);
 ssize_t				ft_putchar_fd(char c, int fd);
 ssize_t				ft_putstr(char const *c);
 ssize_t				ft_putstr_fd(char const *s, int fd);
