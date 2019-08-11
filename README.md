@@ -35,3 +35,5 @@ Document the functions and what they do.\
 Don't name \*.c files with numbers at the end.
 
 Not one of the best project, but one of the longest.
+##### Score:
+![](images/printf_score.png)
