@@ -19,12 +19,18 @@ About my printf:
 
 Speed:
 * System call reduces speed. Reduce the amount of write function calls will speed up the function.
-* Reduce the amount of hard-coding to get the right behavior. 😂
+* Too many if statements to get the right behavior. 😂
   * Most of the hard-coding are mainly for calculating spaces and handling modifiers
 
 Data structure:
 * Use of bits to handle flags
 * Dispatch table
 * Parsing variadic function.
+
+#### How to improve in future:
+
+Speed wise, store data the data in the buffer and flush the buffer out with single use of write.\
+Structure wise, reduce the amount if statements.\
+Document the functions and what they do.\
 
 Not one of the best project, but one of the longest.
