@@ -31,6 +31,6 @@ Data structure:
 
 Speed wise, store data the data in the buffer and flush the buffer out with single use of write.\
 Structure wise, reduce the amount if statements.\
-Document the functions and what they do.\
+Document the functions and what they do.
 
 Not one of the best project, but one of the longest.
